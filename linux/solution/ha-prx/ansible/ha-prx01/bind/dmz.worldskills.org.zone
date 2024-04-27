@@ -1,0 +1,30 @@
+$TTL 1h
+@   IN SOA dmz.worldskills.org. admin.dmz.worldskills.org. (
+        2023042601 ; Serial
+        1d         ; Refresh
+        2h         ; Retry
+        4w         ; Expire
+        1h         ; Minimum TTL
+)
+; Name Servers
+        IN NS ha-prx01.dmz.worldskills.org.
+        IN NS ha-prx02.dmz.worldskills.org.
+
+; Mail server records
+mail    IN A    10.1.20.10
+        IN AAAA 2001:db8:1001:20::10
+
+; Proxy and HA proxy records
+www      IN CNAME prx-vrrp.dmz.worldskills.org.
+prx-vrrp IN A    10.1.20.20
+         IN AAAA 2001:db8:1001:20::20
+ha-prx01 IN A    10.1.20.21
+         IN AAAA 2001:db8:1001:20::21
+ha-prx02 IN A    10.1.20.22
+         IN AAAA 2001:db8:1001:20::22
+
+; Web server records
+web01   IN A    10.1.20.31
+        IN AAAA 2001:db8:1001:20::31
+web02   IN A    10.1.20.32
+        IN AAAA 2001:db8:1001:20::32

@@ -1,0 +1,13 @@
+$TTL 1h
+@   IN SOA int.worldskills.org. admin.int.worldskills.org. (
+        2023042601 ; Serial
+        1d         ; Refresh
+        2h         ; Retry
+        4w         ; Expire
+        1h         ; Minimum TTL
+)
+; Name Servers
+        IN NS int-srv01.int.worldskills.org.
+; Hosts
+int-srv01   IN A 10.1.10.10
+            IN AAAA 2001:db8:1001:10::10

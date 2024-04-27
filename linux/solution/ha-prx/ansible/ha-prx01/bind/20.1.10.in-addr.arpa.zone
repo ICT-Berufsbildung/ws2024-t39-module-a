@@ -1,0 +1,18 @@
+@   IN SOA dmz.worldskills.org. admin.dmz.worldskills.org. (
+        2023042701 ; Serial
+        1d         ; Refresh
+        2h         ; Retry
+        4w         ; Expire
+        1h         ; Minimum TTL
+)
+; Name Servers
+        IN NS ha-prx01.dmz.worldskills.org.
+        IN NS ha-prx02.dmz.worldskills.org.
+
+; PTR Records for reverse DNS
+10      IN PTR mail.dmz.worldskills.org.
+20      IN PTR prx-vrrp.dmz.worldskills.org.
+21      IN PTR ha-prx01.dmz.worldskills.org.
+22      IN PTR ha-prx02.dmz.worldskills.org.
+31      IN PTR web01.dmz.worldskills.org.
+32      IN PTR web02.dmz.worldskills.org.

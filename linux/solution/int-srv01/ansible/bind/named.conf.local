@@ -1,0 +1,49 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+include "/etc/bind/tsig.key";
+
+zone "int.worldskills.org" IN {
+    type master;
+    file "/etc/bind/int.worldskills.org.zone";
+    allow-transfer { key "tsig-key"; };
+    allow-query { any; };
+};
+zone "10.1.10.in-addr.arpa" IN {
+    type master;
+    file "/etc/bind/10.1.10.in-addr.arpa.zone";
+    allow-transfer { key "tsig-key"; };
+    allow-query { any; };
+};
+
+zone "0.1.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa" IN {
+    type master;
+    file "/etc/bind/0.1.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa.zone";
+    allow-transfer { key "tsig-key"; };
+    allow-query { any; };
+};
+zone "dmz.worldskills.org" IN {
+    type slave;
+    file "/var/cache/bind/dmz.worldskills.org.zone";
+    masters { 10.1.20.21; };
+    allow-query { any; };
+};
+
+zone "20.1.10.in-addr.arpa" IN {
+    type slave;
+    file "/var/cache/bind/20.1.10.in-addr.arpa.zone";
+    masters { 10.1.20.21; };
+    allow-query { any; };
+};
+
+zone "0.2.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa" IN {
+    type slave;
+    file "/var/cache/bind//0.2.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa.zone";
+    masters { 10.1.20.21; };
+    allow-query { any; };
+};

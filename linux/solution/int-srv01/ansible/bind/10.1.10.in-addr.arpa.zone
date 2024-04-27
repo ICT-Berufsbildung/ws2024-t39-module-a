@@ -1,0 +1,12 @@
+@   IN SOA int.worldskills.org. admin.int.worldskills.org. (
+        2023042701 ; Serial
+        1d         ; Refresh
+        2h         ; Retry
+        4w         ; Expire
+        1h         ; Minimum TTL
+)
+; Name Servers
+        IN NS int-srv01.int.worldskills.org.
+
+; PTR Records for reverse DNS
+10      IN PTR int-srv01.int.worldskills.org.

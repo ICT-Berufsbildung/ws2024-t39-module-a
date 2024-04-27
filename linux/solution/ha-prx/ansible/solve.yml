@@ -1,0 +1,59 @@
+---
+- hosts: all
+  connection: local
+  gather_facts: no
+  tasks:
+  - name: Install packages
+    ansible.builtin.package:
+      name:
+      - haproxy
+      - keepalived
+      - bind9
+      state: present
+
+  - name: copy certificate
+    ansible.builtin.copy:
+      src: ./web.pem
+      dest: /etc/ssl/web.pem
+
+  - name: copy haproxy.cfg
+    ansible.builtin.copy:
+      src: ./haproxy.cfg
+      dest: /etc/haproxy/
+
+  - name: fetch the hostname
+    command: hostname
+    register: host_output
+
+  - name: copy keepalived.conf
+    ansible.builtin.copy:
+      src: ./{{ host_output.stdout }}/keepalived.conf
+      dest: /etc/keepalived
+  - name: copy bind configuration
+    ansible.builtin.copy:
+      src: ./{{ host_output.stdout }}/bind/
+      dest: /etc/bind
+      owner: bind
+      group: bind
+
+  - name: inject the hostname into the haproxy.cfg
+    replace:
+      path: /etc/haproxy/haproxy.cfg
+      regexp: 'snakeoil'   # Specify the string/regex to find in the file
+      replace: "{{ host_output.stdout }}"
+
+  - name: Restart + enable haproxy on boot
+    ansible.builtin.systemd_service:
+      state: restarted
+      name: haproxy
+      enabled: true
+  - name: Restart + enable keepalived on boot
+    ansible.builtin.systemd_service:
+      state: restarted
+      name: keepalived
+      enabled: true
+  - name: Restart + enable bind9 on boot
+    ansible.builtin.systemd_service:
+      state: restarted
+      name: named
+      enabled: true

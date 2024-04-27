@@ -1,0 +1,29 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# Internet
+auto ens192
+iface ens192 inet static
+  address 1.1.221.10/24
+iface ens192 inet6 static
+  address 2001:db8:1111::10/64
+
+# Internal
+auto ens224
+iface ens224 inet static
+  address 10.1.10.1/24
+iface ens224 inet6 static
+  address 2001:db8:1001:10::1/64
+
+# DMZ
+auto ens256
+iface ens256 inet static
+  address 10.1.20.1/24
+iface ens256 inet6 static
+  address 2001:db8:1001:20::1/64

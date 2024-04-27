@@ -1,0 +1,289 @@
+---
+- hosts: all
+  connection: local
+  gather_facts: no
+  tasks:
+  - name: Install packages
+    ansible.builtin.package:
+      name:
+      - slapd
+      - bind9
+      - samba
+      - python3-ldap
+      state: present
+  - name: Ensure the LDAP is running
+    service:
+      name: slapd
+      state: started
+      enabled: yes
+  - name: Configure LDAP
+    shell: |
+      debconf-set-selections <<< "slapd slapd/internal/adminpw password Skill39"
+      debconf-set-selections <<< "slapd slapd/internal/generated_adminpw password Skill39"
+      debconf-set-selections <<< "slapd slapd/password2 password Skill39"
+      debconf-set-selections <<< "slapd slapd/password1 password Skill39"
+      debconf-set-selections <<< "slapd slapd/domain string int.worldskills.org"
+      DEBIAN_FRONTEND=noninteractive dpkg-reconfigure slapd
+    args:
+      executable: /bin/bash
+
+  - name: Add LDAP schemas and initial entries
+    ldap_entry:
+      dn: "cn=admin,dc=int,dc=worldskills,dc=org"
+      objectClass:
+        - top
+        - person
+      attributes:
+        sn: "Admin"
+        cn: "Admin"
+      bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
+      bind_pw: "Skill39"
+      server_uri: "ldap://localhost"
+    no_log: false  # Don't log sensitive information
+
+  - name: Generate hashed password for Jamie Oliver
+    command: "slappasswd -s Skill39"
+    register: hashed_password
+    changed_when: false
+    no_log: true
+
+  - name: Add OU for Employees
+    community.general.ldap_entry:
+      dn: "ou=Employees,dc=int,dc=worldskills,dc=org"
+      objectClass: organizationalUnit
+      attributes:
+        ou: Employees
+      bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
+      bind_pw: "Skill39"
+      server_uri: "ldap://localhost"
+      state: present
+
+  - name: Create a user Jamie Oliver
+    community.general.ldap_entry:
+      dn: "cn=Jamie Oliver,ou=Employees,dc=int,dc=worldskills,dc=org"
+      objectClass:
+        - inetOrgPerson
+        - top
+      attributes:
+        cn: "Jamie Oliver"
+        sn: "Oliver"
+        mail: "jamie.oliver@dmz.worldskills.org"
+        uid: "jamieoliver"
+        userPassword: "{{ hashed_password.stdout }}"
+      bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
+      bind_pw: "Skill39"
+      server_uri: "ldap://localhost"
+      state: present
+
+
+
+  - name: copy bind configuration
+    ansible.builtin.copy:
+      src: ./bind/
+      dest: /etc/bind
+      owner: bind
+      group: bind
+  - name: Restart + enable bind9 on boot
+    ansible.builtin.systemd_service:
+      state: restarted
+      name: named
+      enabled: true
+
+
+
+  - name: copy samba configuration
+    ansible.builtin.copy:
+      src: ./smb.conf
+      dest: /etc/samba
+
+  - name: Add group internal
+    ansible.builtin.group:
+      name: internal
+      state: present
+
+  - name: Add user jamie
+    ansible.builtin.user:
+      name: "jamie"
+      group: "internal"
+      createhome: yes
+
+  - name: Set the user password
+    ansible.builtin.user:
+      name: "jamie"
+      password: "$6$/2GQMprO00TDJ12x$rtmpvYdHB1NIW6hIDBZJ8pgz.DPqha1.12egniFNytakeKcYZ10UI7M/DGs4QLTL5D1YNEESMWk1KtZNW5Gei/"
+
+  - name: Add user to the internal group
+    ansible.builtin.user:
+      name: "jamie"
+      groups: "internal"
+
+  - name: Create Samba user
+    ansible.builtin.shell:
+      cmd: "printf '%s\n%s\n' 'Skill39' 'Skill39' | smbpasswd -a -s jamie"
+  - name: Enable Samba user
+    ansible.builtin.shell:
+      cmd: "smbpasswd -e jamie"
+  - name: Create public directory
+    ansible.builtin.file:
+      path: /opt/public
+      state: directory
+      mode: 0775
+      group: internal
+      owner: root
+  - name: Create internal directory
+    ansible.builtin.file:
+      path: /opt/internal
+      state: directory
+      mode: 0770
+      group: internal
+      owner: root
+
+  - name: Create ca directory
+    ansible.builtin.file:
+      path: /opt/grading/ca/
+      state: directory
+      mode: 0777
+
+  - name: Create root CA key
+    community.crypto.openssl_privatekey:
+      path: /opt/grading/ca/ca.key
+
+  - name: Create users CA key
+    community.crypto.openssl_privatekey:
+      path: /opt/grading/ca/users.key
+
+  - name: Create services CA key
+    community.crypto.openssl_privatekey:
+      path: /opt/grading/ca/services.key
+
+  - name: Create jamie key
+    community.crypto.openssl_privatekey:
+      path: /opt/grading/ca/jamie.key
+
+  - name: Create web key
+    community.crypto.openssl_privatekey:
+      path: /opt/grading/ca/web.key
+
+  - name: Create mail key
+    community.crypto.openssl_privatekey:
+      path: /opt/grading/ca/mail.key
+
+
+  - name: Create root CA CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /opt/grading/ca/ca.key
+      common_name: ClearSky Root CA
+      use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
+      basic_constraints:
+        - 'CA:TRUE'
+      basic_constraints_critical: true
+      key_usage:
+        - keyCertSign
+      key_usage_critical: true
+    register: ca_csr
+
+  - name: Create users CA CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /opt/grading/ca/users.key
+      common_name: ClearSky User CA
+      use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
+      basic_constraints:
+        - 'CA:TRUE'
+      basic_constraints_critical: true
+      key_usage:
+        - keyCertSign
+      key_usage_critical: true
+    register: users_csr
+
+  - name: Create services CA CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /opt/grading/ca/services.key
+      common_name: ClearSky Services CA
+      use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
+      basic_constraints:
+        - 'CA:TRUE'
+      basic_constraints_critical: true
+      key_usage:
+        - keyCertSign
+      key_usage_critical: true
+    register: services_csr
+
+  - name: Create jamie CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /opt/grading/ca/jamie.key
+      common_name: jamie@dmz.worldskills.org
+      use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
+      key_usage:
+        - digitalSignature
+        - keyEncipherment
+      extended_key_usage:
+        - clientAuth
+    register: jamie_csr
+
+  - name: Create web CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /opt/grading/ca/web.key
+      common_name: www.dmz.worldskills.org
+      use_common_name_for_san: true
+    register: web_csr
+
+  - name: Create mail CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /opt/grading/ca/mail.key
+      common_name: mail.dmz.worldskills.org
+      use_common_name_for_san: true
+    register: mail_csr
+
+
+  - name: Self-Sign root CA
+    community.crypto.x509_certificate:
+      path: /opt/grading/ca/ca.pem
+      csr_content: "{{ ca_csr.csr }}"
+      privatekey_path: /opt/grading/ca/ca.key
+      provider: selfsigned
+
+  - name: Sign users CA using Root CA
+    community.crypto.x509_certificate:
+      path: /opt/grading/ca/users.pem
+      csr_content: "{{ users_csr.csr }}"
+      privatekey_path: /opt/grading/ca/users.key
+      provider: ownca
+      ownca_path: /opt/grading/ca/ca.pem
+      ownca_privatekey_path: /opt/grading/ca/ca.key
+
+  - name: Sign services CA using Root CA
+    community.crypto.x509_certificate:
+      path: /opt/grading/ca/services.pem
+      csr_content: "{{ services_csr.csr }}"
+      privatekey_path: /opt/grading/ca/services.key
+      provider: ownca
+      ownca_path: /opt/grading/ca/ca.pem
+      ownca_privatekey_path: /opt/grading/ca/ca.key
+
+  - name: Sign jamie cert using users CA
+    community.crypto.x509_certificate:
+      path: /opt/grading/ca/jamie.pem
+      csr_content: "{{ jamie_csr.csr }}"
+      privatekey_path: /opt/grading/ca/jamie.key
+      provider: ownca
+      ownca_path: /opt/grading/ca/users.pem
+      ownca_privatekey_path: /opt/grading/ca/users.key
+
+
+  - name: Sign web cert using services CA
+    community.crypto.x509_certificate:
+      path: /opt/grading/ca/web.pem
+      csr_content: "{{ web_csr.csr }}"
+      privatekey_path: /opt/grading/ca/web.key
+      provider: ownca
+      ownca_path: /opt/grading/ca/services.pem
+      ownca_privatekey_path: /opt/grading/ca/services.key
+
+  - name: Sign mail cert using services CA
+    community.crypto.x509_certificate:
+      path: /opt/grading/ca/mail.pem
+      csr_content: "{{ mail_csr.csr }}"
+      privatekey_path: /opt/grading/ca/mail.key
+      provider: ownca
+      ownca_path: /opt/grading/ca/services.pem
+      ownca_privatekey_path: /opt/grading/ca/services.key
