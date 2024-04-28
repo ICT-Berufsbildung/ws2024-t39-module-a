@@ -10,7 +10,9 @@ iface lo inet loopback
 # Internet
 auto ens192
 iface ens192 inet static
-  address 1.1.221.10/24
+  address 1.1.1.10/24
+  gateway 1.1.1.1
+  dns-nameserver 127.0.0.1
 iface ens192 inet6 static
   address 2001:db8:1111::10/64
 
