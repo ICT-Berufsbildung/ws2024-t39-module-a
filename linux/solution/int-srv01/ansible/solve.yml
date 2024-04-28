@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  connection: local
+#  connection: local
   gather_facts: no
   tasks:
   - name: Install packages
@@ -63,13 +63,17 @@
       dn: "cn=Jamie Oliver,ou=Employees,dc=int,dc=worldskills,dc=org"
       objectClass:
         - inetOrgPerson
+        - posixAccount
         - top
       attributes:
         cn: "Jamie Oliver"
         sn: "Oliver"
         mail: "jamie.oliver@dmz.worldskills.org"
-        uid: "jamieoliver"
+        uid: "jamie.oliver"
+        uidNumber: 1111
+        gidNumber: 1111
         userPassword: "{{ hashed_password.stdout }}"
+        homeDirectory: /home/jamie
       bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
       bind_pw: "Skill39"
       server_uri: "ldap://localhost"

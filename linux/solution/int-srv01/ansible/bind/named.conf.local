@@ -8,25 +8,28 @@
 
 include "/etc/bind/tsig.key";
 
+server 10.1.20.21 {
+        keys { tsig-key; };
+};
+
+
 zone "int.worldskills.org" IN {
     type master;
     file "/etc/bind/int.worldskills.org.zone";
-    allow-transfer { key "tsig-key"; };
     allow-query { any; };
 };
 zone "10.1.10.in-addr.arpa" IN {
     type master;
     file "/etc/bind/10.1.10.in-addr.arpa.zone";
-    allow-transfer { key "tsig-key"; };
     allow-query { any; };
 };
 
 zone "0.1.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa" IN {
     type master;
     file "/etc/bind/0.1.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa.zone";
-    allow-transfer { key "tsig-key"; };
     allow-query { any; };
 };
+
 zone "dmz.worldskills.org" IN {
     type slave;
     file "/var/cache/bind/dmz.worldskills.org.zone";
