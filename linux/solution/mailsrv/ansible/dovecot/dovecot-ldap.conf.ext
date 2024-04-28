@@ -1,0 +1,23 @@
+# LDAP server URL
+hosts = int-srv01.int.worldskills.org
+# DN to connect to LDAP server
+dn = cn=admin,dc=int,dc=worldskills,dc=org
+dnpass = Skill39
+
+# Base DN for user searches
+base = ou=Employees,dc=int,dc=worldskills,dc=org
+
+
+# User attributes mapping
+user_attrs = \
+  uidNumber=uid,\
+  gidNumber=gid,\
+  homeDirectory=home,\
+  mailMessageStore=mail
+
+# User filter
+user_filter = (&(objectClass=inetOrgPerson)(uid=%n))
+pass_filter = (&(objectClass=inetOrgPerson)(uid=%n))
+
+# Default user settings (if LDAP query fails)
+default_pass_scheme = SHA512-CRYPT

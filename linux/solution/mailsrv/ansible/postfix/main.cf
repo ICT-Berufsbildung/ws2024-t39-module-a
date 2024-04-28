@@ -1,0 +1,34 @@
+# Postfix main configuration file
+queue_directory = /var/spool/postfix
+command_directory = /usr/sbin
+daemon_directory = /usr/lib/postfix/sbin
+data_directory = /var/lib/postfix
+mail_owner = postfix
+
+# Basic mail setup
+myhostname = mail.dmz.worldskills.org
+mydomain = dmz.worldskills.org
+myorigin = $mydomain
+smtpd_banner = $myhostname ESMTP $mail_name
+smtpd_use_tls=yes
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+inet_interfaces = all
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+local_recipient_maps =
+
+# LDAP Configuration
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_local_domain = $myhostname
+smtpd_recipient_restrictions = permit_sasl_authenticated,reject_unauth_destination
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+
+# Auto-reply for echo@ws.org using autoresponder
+sender_bcc_maps = hash:/etc/postfix/sender_bcc
+transport_maps = hash:/etc/postfix/transport
+
+# Setting up Dovecot LDA
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+dovecot_destination_recipient_limit = 1
+home_mailbox = Maildir/

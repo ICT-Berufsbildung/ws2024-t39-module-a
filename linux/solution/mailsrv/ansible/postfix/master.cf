@@ -1,0 +1,58 @@
+# ==========================================================================
+# service type  private unpriv  chroot  wakeup  maxproc command + args
+#               (yes)   (yes)   (no)    (never) (100)
+# ==========================================================================
+
+# SMTP on port 25, handling incoming connections
+smtp      inet  n       -       y       -       -       smtpd
+
+# Submission service for secure sending on port 587
+submission inet n       -       y       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_reject_unlisted_recipient=no
+  -o smtpd_client_restrictions=$mua_client_restrictions
+  -o smtpd_helo_restrictions=$mua_helo_restrictions
+  -o smtpd_sender_restrictions=$mua_sender_restrictions
+  -o smtpd_recipient_restrictions=
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+
+# SMTPS service for encrypted sending on port 465
+smtps     inet  n       -       y       -       -       smtpd
+  -o syslog_name=postfix/smtps
+  -o smtpd_tls_wrappermode=yes
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_reject_unlisted_recipient=no
+  -o smtpd_client_restrictions=$mua_client_restrictions
+  -o smtpd_helo_restrictions=$mua_helo_restrictions
+  -o smtpd_sender_restrictions=$mua_sender_restrictions
+  -o smtpd_recipient_restrictions=
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+
+# For delivering to Dovecot LDA
+dovecot   unix  -       n       n       -       -       pipe
+  flags=DRhu user=vmail:vmail argv=/usr/lib/dovecot/deliver -d ${recipient}
+
+# Other services
+pickup    fifo  n       -       y       60      1       pickup
+cleanup   unix  n       -       y       -       0       cleanup
+qmgr      fifo  n       -       n       300     1       qmgr
+tlsmgr    unix  -       -       y       1000?   1       tlsmgr
+rewrite   unix  -       -       y       -       -       trivial-rewrite
+bounce    unix  -       -       y       -       0       bounce
+defer     unix  -       -       y       -       0       defer
+trace     unix  -       -       y       -       0       trace
+verify    unix  -       -       y       -       1       verify
+flush     unix  n       -       y       1000?   0       flush
+proxymap  unix  -       -       n       -       -       proxymap
+proxywrite unix -       -       n       -       1       proxymap
+smtp      unix  -       -       y       -       -       smtp
+relay     unix  -       -       y       -       -       relay
+showq     unix  n       -       y       -       -       showq
+error     unix  -       -       y       -       -       error
+retry     unix  -       -       y       -       -       retry
+discard   unix  -       -       y       -       -       discard
+local     unix  -       n       n       -       -       local
