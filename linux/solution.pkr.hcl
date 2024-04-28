@@ -59,6 +59,10 @@ build {
     destination = "/etc/network/interfaces"
   }
   provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
+  }
+  provisioner "file" {
     source = "solution/ha-prx/"
     destination = "/opt"
   }
@@ -86,6 +90,10 @@ build {
     destination = "/etc/network/interfaces"
   }
   provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
+  }
+  provisioner "file" {
     source = "solution/ha-prx/"
     destination = "/opt"
   }
@@ -110,6 +118,10 @@ build {
   provisioner "file" {
     source = "http/web/interfaces01"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
   }
   provisioner "file" {
     source = "http/web/wwwroot"
@@ -140,6 +152,10 @@ build {
   provisioner "file" {
     source = "http/web/interfaces02"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
   }
   provisioner "file" {
     source = "http/web/wwwroot"
@@ -176,6 +192,10 @@ build {
     source = "http/mailsrv/interfaces"
     destination = "/etc/network/interfaces"
   }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
+  }
 }
 # int-srv01
 build {
@@ -194,6 +214,10 @@ build {
   provisioner "file" {
     source = "http/int-srv01/interfaces"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.int.conf"
+    destination = "/etc/resolv.conf"
   }
   provisioner "file" {
     source = "solution/int-srv01/"
@@ -220,6 +244,17 @@ build {
   provisioner "file" {
     source = "http/jamie-ws01/interfaces"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.int.conf"
+    destination = "/etc/resolv.conf"
+  }
+  provisioner "file" {
+    source = "solution/jamie-ws01/"
+    destination = "/opt"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /opt/ansible/solve.yml -i 'localhost,'"]
   }
 }
 #fw01
@@ -254,5 +289,9 @@ build {
   }
   provisioner "shell" {
     inline = ["ansible-playbook /opt/ansible/solve.yml -i 'localhost,'"]
+  }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
   }
 }

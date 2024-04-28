@@ -58,6 +58,10 @@ build {
     source = "http/ha-prx/interfaces01"
     destination = "/etc/network/interfaces"
   }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
+  }
 
 }
 # ha-prx02
@@ -77,6 +81,10 @@ build {
   provisioner "file" {
     source = "http/ha-prx/interfaces02"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
   }
 }
 # web01
@@ -101,6 +109,10 @@ build {
     source = "http/web/wwwroot"
     destination = "/opt"
   }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
+  }
 }
 # web02
 build {
@@ -123,6 +135,10 @@ build {
   provisioner "file" {
     source = "http/web/wwwroot"
     destination = "/opt"
+  }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
   }
 }
 # mailsrv
@@ -147,6 +163,10 @@ build {
     source = "http/mailsrv/interfaces"
     destination = "/etc/network/interfaces"
   }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
+  }
 }
 # int-srv01
 build {
@@ -166,6 +186,10 @@ build {
     source = "http/int-srv01/interfaces"
     destination = "/etc/network/interfaces"
   }
+  provisioner "file" {
+    source = "http/resolv.int.conf"
+    destination = "/etc/resolv.conf"
+  }
 }
 # jamie-ws01
 build {
@@ -184,6 +208,10 @@ build {
   provisioner "file" {
     source = "http/jamie-ws01/interfaces"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.int.conf"
+    destination = "/etc/resolv.conf"
   }
 }
 #fw01
@@ -211,5 +239,9 @@ build {
   provisioner "file" {
     source = "http/firewall/interfaces"
     destination = "/etc/network/interfaces"
+  }
+  provisioner "file" {
+    source = "http/resolv.dmz.conf"
+    destination = "/etc/resolv.conf"
   }
 }
