@@ -3,9 +3,11 @@
   connection: local
   gather_facts: no
   tasks:
-    - name: Install WireGuard
+    - name: Install packages
       package:
-        name: wireguard
+        name:
+        - wireguard
+        - squid
         state: present
 
     - name: Enable IPv4 forwarding
@@ -23,14 +25,39 @@
         sysctl_set: yes
         state: present
         reload: yes
-
+# The following two tasks are only needed in my lab environment.
+    - name: "Fix: ignore arp request from the 'wrong' interface"
+      sysctl:
+        name: net.ipv4.conf.all.arp_ignore
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+    - name: "Fix: reply only if the target IP address is local address
+  configured on the incoming interface and both with the
+  sender's IP address are part from same subnet on this interface"
+      sysctl:
+        name: net.ipv4.conf.all.arp_announce
+        value: '2'
+        sysctl_set: yes
+        state: present
+        reload: yes
     - name: Configure nftables rules
       copy:
         src: ./nftables.conf
         dest: /etc/nftables.conf
 
-    - name: Enable and start nftables
+    - name: Configure squid
+      copy:
+        src: ./squid.conf
+        dest: /etc/squid
+    - name: Enable and start squid
+      systemd:
+        name: squid
+        enabled: yes
+        state: restarted
+    - name: Enable
       systemd:
         name: nftables
         enabled: yes
-        state: started
+        state: stopped # geit das so?
