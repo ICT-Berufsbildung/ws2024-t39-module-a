@@ -1,5 +1,5 @@
 # LDAP server URL
-hosts = int-srv01.int.worldskills.org
+hosts = 10.1.10.10
 # DN to connect to LDAP server
 dn = cn=admin,dc=int,dc=worldskills,dc=org
 dnpass = Skill39

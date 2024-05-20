@@ -9,7 +9,7 @@ smtp      inet  n       -       y       -       -       smtpd
 # Submission service for secure sending on port 587
 submission inet n       -       y       -       -       smtpd
   -o syslog_name=postfix/submission
-  -o smtpd_tls_security_level=encrypt
+#  -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
   -o smtpd_reject_unlisted_recipient=no
   -o smtpd_client_restrictions=$mua_client_restrictions
@@ -32,9 +32,8 @@ smtps     inet  n       -       y       -       -       smtpd
   -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
   -o milter_macro_daemon_name=ORIGINATING
 
-# For delivering to Dovecot LDA
 dovecot   unix  -       n       n       -       -       pipe
-  flags=DRhu user=vmail:vmail argv=/usr/lib/dovecot/deliver -d ${recipient}
+  flags=DRhu user=vmail:vmail argv=/usr/lib/dovecot/dovecot-lda -f ${sender} -d ${recipient}
 
 # Other services
 pickup    fifo  n       -       y       60      1       pickup
@@ -55,4 +54,4 @@ showq     unix  n       -       y       -       -       showq
 error     unix  -       -       y       -       -       error
 retry     unix  -       -       y       -       -       retry
 discard   unix  -       -       y       -       -       discard
-local     unix  -       n       n       -       -       local
+#local     unix  -       n       n       -       -       local

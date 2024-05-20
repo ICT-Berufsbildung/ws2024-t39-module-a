@@ -1,8 +1,11 @@
 ---
 - hosts: all
-#  connection: local
+  connection: local
   gather_facts: no
   tasks:
+    - name: Gather the system facts
+      ansible.builtin.setup:
+
     - name: Install packages
       ansible.builtin.package:
         name:
@@ -10,26 +13,141 @@
           - dovecot-core
           - dovecot-ldap
           - dovecot-sieve
-          - dovecot-managesieved
-          - postfix
-          - postfix-ldap
+          - dovecot-imapd
+          - cryptsetup
         state: present
 
-#    - name: Copy nginx.conf
-#      ansible.builtin.copy:
-#        src: ./nginx.conf
-#        dest: /etc/nginx/nginx.conf
-#    - name: fetch the hostname
-#      command: hostname
-#      register: host_output
-#    - name: inject the hostname into the nginx.conf
-#      replace:
-#        path: /etc/nginx/nginx.conf
-#        regexp: 'snakeoil'   # Specify the string/regex to find in the file
-#        replace: "{{ host_output.stdout }}"
-#
-#    - name: Restart + enable nginx on boot
-#      ansible.builtin.systemd_service:
-#        state: restarted
-#        name: nginx
-#        enabled: true
+    - name: Copy postfix config
+      ansible.builtin.copy:
+        src: ./postfix/
+        dest: /etc/postfix
+        force: yes
+    - name: Copy dovecot config
+      ansible.builtin.copy:
+        src: ./dovecot/
+        dest: /etc/dovecot
+        force: yes
+    - name: Copy backup script
+      ansible.builtin.copy:
+        src: ./backup.sh
+        dest: /root
+        force: yes
+    - name: Copy postfix cert
+      ansible.builtin.copy:
+        src: ./postfix/postfix.pem
+        dest: /etc/ssl/certs
+        force: yes
+    - name: Copy postfix key
+      ansible.builtin.copy:
+        src: ./postfix/postfix.key
+        dest: /etc/ssl/private
+        force: yes
+    - name: Copy ssh ca files
+      ansible.builtin.copy:
+        src: ./ssh/
+        dest: /etc/ssh
+        force: yes
+    - name: Add CA to sshd_conf
+      ansible.builtin.lineinfile:
+        path: /etc/sshd
+        line: TrustedUserCAKeys /etc/ssh/ca.key.pub
+        create: yes
+
+    - name: Ensure vmail group exists
+      group:
+        name: vmail
+        state: present
+    - name: Add vmail user for Dovecot
+      user:
+        name: vmail
+        comment: "Virtual Mail User"
+        group: vmail
+
+    - name: Create directory /var/mailboxes
+      ansible.builtin.file:
+        path: /var/mailboxes
+        state: directory
+        mode: '0700'
+        owner: vmail
+        group: vmail
+
+    - name: Create directory /etc/keys/
+      ansible.builtin.file:
+        path: /etc/keys
+        state: directory
+        mode: '0700'
+        owner: root
+        group: root
+
+    - name: Generate luks keyfile
+      community.crypto.openssl_privatekey:
+        path: /etc/keys/backup.key
+        owner: root
+        group: root
+
+    - name: Create luks container and add keys
+      community.crypto.luks_device:
+        device: "/dev/sdb"
+        state: opened
+        passphrase: "Skill39"
+        new_keyfile: /etc/keys/backup.key
+        name: "backup"
+
+    - name: Get UUID of disk
+      ansible.builtin.command: lsblk /dev/sdb -no UUID -I 8 -d
+      register: disk_UUID
+
+    - name: Fail if UUID is not an UUID
+      ansible.builtin.fail:
+        msg: Could not evaluate the disk UUID!
+      when: disk_UUID.stdout is not regex('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
+
+    - name: Show disk UUID
+      debug:
+        msg: "The UUID of /dev/sdb is {{ disk_UUID.stdout }}"
+
+    - name: Add Container to crypttab
+      community.general.crypttab:
+        backing_device: "UUID={{ disk_UUID.stdout }}"
+        name: "backup"
+        state: present
+        password: /etc/keys/backup.key
+        opts: discard
+
+    - name: Create filesystem
+      community.general.filesystem:
+        fstype: ext4
+        dev: /dev/mapper/backup
+        state: present
+
+    - name: Get UUID of filesystem
+      ansible.builtin.command: lsblk /dev/mapper/backup -no UUID -I 8 -d
+      register: fs_UUID
+
+    - name: Fail if UUID is not an UUID
+      ansible.builtin.fail:
+        msg: Could not evaluate the fs UUID!
+      when: fs_UUID.stdout is not regex('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
+
+    - name: Show fs UUID
+      debug:
+        msg: "The UUID of /dev/mapper/backup is {{ fs_UUID.stdout }}"
+
+    - name: Mount filesystem
+      ansible.posix.mount:
+        path: "/opt/backup"
+        src: "UUID={{ fs_UUID.stdout }}"
+        fstype: ext4
+        state: mounted
+
+    - name: Restart + enable postfix on boot
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: postfix
+        enabled: true
+        
+    - name: Restart + enable dovecot on boot
+      ansible.builtin.systemd_service:
+        state: restarted
+        name: dovecot
+        enabled: true
