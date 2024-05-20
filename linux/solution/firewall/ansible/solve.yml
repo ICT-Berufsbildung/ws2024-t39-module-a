@@ -46,18 +46,27 @@
       copy:
         src: ./nftables.conf
         dest: /etc/nftables.conf
-
     - name: Configure squid
       copy:
-        src: ./squid.conf
-        dest: /etc/squid
-    - name: Enable and start squid
+        src: ./transparent-proxy.conf
+        dest: /etc/squid/conf.d
+    - name: Configure wireguard
+      copy:
+        src: ./wg0.conf
+        dest: /etc/wireguard/
+    - name: Enable squid
       systemd:
         name: squid
         enabled: yes
-        state: restarted
-    - name: Enable
+        state: stopped
+    - name: Enable nftables
       systemd:
         name: nftables
         enabled: yes
-        state: stopped # geit das so?
+        state: stopped
+
+    - name: Enable and start wireguard
+      systemd:
+        name: wg-quick@wg0
+        enabled: yes
+        state: restarted
