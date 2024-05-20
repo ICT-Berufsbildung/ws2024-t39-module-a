@@ -101,7 +101,7 @@
       state: present
   - name: Create user Peter
     community.general.ldap_entry:
-      dn: "cn=peter,ou=Employees,dc=int,dc=worldskills,dc=org"
+      dn: "cn=Peter Fox,ou=Employees,dc=int,dc=worldskills,dc=org"
       objectClass:
         - inetOrgPerson
         - posixAccount
