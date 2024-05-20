@@ -110,7 +110,7 @@
         cn: "Peter Fox"
         sn: "Peter"
         mail: "peter.fox@dmz.worldskills.org"
-        uid: "peter"
+        uid: "peter.fox"
         uidNumber: 1113
         gidNumber: 1113
         userPassword: "{{ hashed_password.stdout }}"
