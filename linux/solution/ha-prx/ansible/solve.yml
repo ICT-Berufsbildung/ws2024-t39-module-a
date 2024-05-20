@@ -9,6 +9,7 @@
       - haproxy
       - keepalived
       - bind9
+      - sshpass
       state: present
 
   - name: copy certificate
@@ -20,11 +21,20 @@
     ansible.builtin.copy:
       src: ./haproxy.cfg
       dest: /etc/haproxy/
-
+  - name: copy ssh config
+    ansible.builtin.copy:
+      src: ./ssh/
+      dest: /root/.ssh
   - name: fetch the hostname
     command: hostname
     register: host_output
-
+  - name: Ensure correct permissions for /root/.ssh/root.key
+    file:
+      path: /root/.ssh/root.key
+      owner: root
+      group: root
+      mode: '0600'
+      state: file
   - name: copy keepalived.conf
     ansible.builtin.copy:
       src: ./{{ host_output.stdout }}/keepalived.conf
@@ -35,6 +45,15 @@
       dest: /etc/bind
       owner: bind
       group: bind
+
+  - name: Create ansible config directory
+    ansible.builtin.file:
+      path: /etc/ansible
+      state: directory
+  - name: copy ansible inventory
+    ansible.builtin.copy:
+      src: ./hosts
+      dest: /etc/ansible/hosts
 
   - name: inject the hostname into the haproxy.cfg
     replace:

@@ -1,0 +1,4 @@
+Host *
+    User root
+    IdentityFile /root/.ssh/root.key
+    CertificateFile /root/.ssh/root.key-cert.pub
