@@ -58,7 +58,7 @@
       server_uri: "ldap://localhost"
       state: present
 
-  - name: Create a user Jamie Oliver
+  - name: Create user Jamie Oliver
     community.general.ldap_entry:
       dn: "cn=Jamie Oliver,ou=Employees,dc=int,dc=worldskills,dc=org"
       objectClass:
@@ -99,7 +99,7 @@
       bind_pw: "Skill39"
       server_uri: "ldap://localhost"
       state: present
-  - name: Create user Peter
+  - name: Create user Peter Fox
     community.general.ldap_entry:
       dn: "cn=Peter Fox,ou=Employees,dc=int,dc=worldskills,dc=org"
       objectClass:
