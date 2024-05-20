@@ -1,6 +1,6 @@
 ---
 - hosts: all
-#  connection: local
+  connection: local
   gather_facts: no
   tasks:
   - name: Install packages
@@ -79,7 +79,46 @@
       server_uri: "ldap://localhost"
       state: present
 
-
+  - name: Create user for echo mailbox
+    community.general.ldap_entry:
+      dn: "cn=echo,ou=Employees,dc=int,dc=worldskills,dc=org"
+      objectClass:
+        - inetOrgPerson
+        - posixAccount
+        - top
+      attributes:
+        cn: "Echo"
+        sn: "Echo"
+        mail: "echo@dmz.worldskills.org"
+        uid: "echo"
+        uidNumber: 1112
+        gidNumber: 1112
+        userPassword: "{{ hashed_password.stdout }}"
+        homeDirectory: /dev/null/nohome
+      bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
+      bind_pw: "Skill39"
+      server_uri: "ldap://localhost"
+      state: present
+  - name: Create user Peter
+    community.general.ldap_entry:
+      dn: "cn=peter,ou=Employees,dc=int,dc=worldskills,dc=org"
+      objectClass:
+        - inetOrgPerson
+        - posixAccount
+        - top
+      attributes:
+        cn: "Peter Fox"
+        sn: "Peter"
+        mail: "peter.fox@dmz.worldskills.org"
+        uid: "peter"
+        uidNumber: 1113
+        gidNumber: 1113
+        userPassword: "{{ hashed_password.stdout }}"
+        homeDirectory: /dev/null/nohome
+      bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
+      bind_pw: "Skill39"
+      server_uri: "ldap://localhost"
+      state: present
 
   - name: copy bind configuration
     ansible.builtin.copy:
