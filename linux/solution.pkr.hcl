@@ -13,10 +13,11 @@ source "vsphere-iso" "base" {
   RAM          = 1024
   boot_command = [
     "<esc><wait>",
+    #"auto url=http://10.20.11.20:{{ .HTTPPort }}/preseed.cfg interface=ens192<wait>", "<enter><wait>"
     "auto url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg interface=ens192<wait>", "<enter><wait>"
   ]
   disk_controller_type = ["pvscsi"]
-  guest_os_type        = "debian11Guest"
+  guest_os_type        = "debian12_64Guest"
   host                 = "esxi.lab.chrusuchopf.ch"
   datastore            = "local"
   insecure_connection  = true
@@ -38,7 +39,11 @@ source "vsphere-iso" "base" {
   http_directory = "http"
   http_port_min  = 5100
   http_port_max  = 5150
-
+  tools_sync_time = true
+  export {
+    force = true
+    output_directory = "./solution-artifacts"
+  }
 }
 # ha-prx01
 build {
@@ -172,10 +177,10 @@ build {
 
 # mailsrv
 build {
-  name = "mailsrv-SOLVED"
+  name = "mail-SOLVED"
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
-    vm_name = "mailsrv-SOLVED"
+    vm_name = "mail-SOLVED"
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -186,7 +191,14 @@ build {
     }
   }
   provisioner "shell" {
-    inline = ["hostnamectl set-hostname mailsrv"]
+    inline = ["hostnamectl set-hostname mail"]
+  }
+  provisioner "file" {
+    source = "solution/mailsrv/"
+    destination = "/opt"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /opt/ansible/solve.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/mailsrv/interfaces"
@@ -196,6 +208,7 @@ build {
     source = "http/resolv.dmz.conf"
     destination = "/etc/resolv.conf"
   }
+
 }
 # int-srv01
 build {

@@ -16,7 +16,7 @@ source "vsphere-iso" "base" {
     "auto url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg interface=ens192<wait>", "<enter><wait>"
   ]
   disk_controller_type = ["pvscsi"]
-  guest_os_type        = "debian11Guest"
+  guest_os_type        = "debian12_64Guest"
   host                 = "esxi.lab.chrusuchopf.ch"
   datastore            = "local"
   insecure_connection  = true
@@ -38,7 +38,11 @@ source "vsphere-iso" "base" {
   http_directory = "http"
   http_port_min  = 5100
   http_port_max  = 5150
-
+  tools_sync_time = true
+  export {
+    force = true
+    output_directory = "./output-artifacts"
+  }
 }
 # ha-prx01
 build {
@@ -143,10 +147,10 @@ build {
 }
 # mailsrv
 build {
-  name = "mailsrv"
+  name = "mail"
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
-    vm_name = "mailsrv"
+    vm_name = "mail"
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -157,7 +161,7 @@ build {
     }
   }
   provisioner "shell" {
-    inline = ["hostnamectl set-hostname mailsrv"]
+    inline = ["hostnamectl set-hostname mail"]
   }
   provisioner "file" {
     source = "http/mailsrv/interfaces"
