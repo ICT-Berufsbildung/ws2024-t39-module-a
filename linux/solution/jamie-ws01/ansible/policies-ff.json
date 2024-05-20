@@ -1,0 +1,15 @@
+{
+  "policies": {
+    "Certificates": {
+      "Install": ["/opt/ansible/ca.crt"]
+    },
+    "Homepage": {
+      "URL": "http://www.dmz.worldskills.org",
+      "Locked": true,
+      "StartPage": "homepage"
+    },
+    "ShowHomeButton": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": ""
+  }
+}

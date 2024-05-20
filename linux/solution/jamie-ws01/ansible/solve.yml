@@ -3,10 +3,48 @@
   connection: local
   gather_facts: no
   tasks:
-    - name: Install gnome
+    - name: Install packages
       ansible.builtin.package:
         name:
           - gnome
           - thunderbird
           - wireguard
+          - firefox-esr
         state: present
+
+    - name: copy firefox policy
+      ansible.builtin.copy:
+        src: ./policies-ff.json
+        dest: /usr/lib/firefox-esr/distribution/policies.json
+
+    - name: Create folder for thunderbird policy
+      ansible.builtin.file:
+        path: /usr/lib/thunderbird/distribution
+        state: directory
+
+    - name: copy thunderbird policy
+      ansible.builtin.copy:
+        src: ./policies-tb.json
+        dest: /usr/lib/thunderbird/distribution/policies.json
+
+    - name: Prepare system to import wireguard on next reboot
+      copy:
+        dest: /etc/systemd/system/import-wg.service
+        content: |
+          [Unit]
+          Description=Import the wireguard profile
+          Requires=NetworkManager.service
+          After=NetworkManager.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=nmcli connection import type wireguard file /opt/ansible/clearsky.conf
+          RemainAfterExit=true
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable systemd service
+      systemd:
+        name: import-wg.service
+        enabled: yes

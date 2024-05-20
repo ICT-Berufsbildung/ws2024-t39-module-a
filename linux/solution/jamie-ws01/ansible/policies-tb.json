@@ -1,0 +1,10 @@
+{
+  "policies": {
+    "Certificates": {
+      "Install": [
+        "/opt/ansible/ca.crt"
+      ]
+    },
+    "datareporting.policy.dataSubmissionPolicyBypassNotification": true
+  }
+}
