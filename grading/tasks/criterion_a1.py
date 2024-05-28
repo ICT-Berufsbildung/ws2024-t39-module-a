@@ -14,8 +14,9 @@ def task_A1_01(task: Task) -> Result:
     """LDAP check"""
     return Result(
         host=task.host,
+        id="A1_01",
         result=f"LDAP port tcp/389 is reachable" if got_mark else "LDAP port tcp/389 is NOT reachable",
         command_run=command,
-        point=0.1 if got_mark else 0.0,
-        max_point=0.1
+        score=0.1 if got_mark else 0.0,
+        max_score=0.1
     )
