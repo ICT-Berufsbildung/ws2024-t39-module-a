@@ -1,21 +1,15 @@
-import logging
+import re
+import textwrap
 import threading
-from typing import Union, cast
 
 from colorama import Fore, Style, init
 
 from nornir.core.inventory import Host
-from nornir.core.task import AggregatedResult, MultiResult, Result, Task
+from nornir.core.task import AggregatedResult, MultiResult, Task
 
 init(autoreset=True, strip=False)
 
-
-def _get_color(result: Union[MultiResult, Result]) -> str:
-    color = Fore.GREEN
-    if result.failed:
-        color = Fore.RED
-        
-    return cast(str, color)
+PREFIX_LENGTH = 11
 
 
 class PrintScoreReport:
@@ -54,17 +48,25 @@ ___] |___ |__| |  \ |___    |  \ |___ |    |__| |  \  |
         self.lock.acquire()
         for res in results:
             # Skip any non WSC marking tasks
-            if not hasattr(res, "id") and not hasattr(res, "score"):
+            if not hasattr(res, "score"):
                 continue
 
             # Get attributes
-            id = getattr(results, "id", "??")
+            id = results.name.replace("task_", "")
             score = getattr(results, "score", 0.0)
             max_score = getattr(results, "max_score", 0.0)
             color = Fore.GREEN if score == max_score else Fore.RED
 
             # print task
-            msg = f"=> [{id}] {results.result}:{''.ljust(60 - len(results.result))}{Style.BRIGHT}{color}{score}"
+            intend = "".ljust(PREFIX_LENGTH)
+            output_formatted = f"\n{intend}".join(textwrap.wrap(results.result, 64))
+            output_split = output_formatted.split("\n")
+            padding_size = (
+                70 - len(output_split[-1])
+                if len(output_split) > 1
+                else 70 - (len(output_split[-1]) + PREFIX_LENGTH)
+            )
+            msg = f"=> [{id}] {output_formatted}: {''.ljust(padding_size)}{Style.BRIGHT}{color}{score}"
             print(msg)
             placeholder = "=" if self.even else "-"
             self.even = not self.even

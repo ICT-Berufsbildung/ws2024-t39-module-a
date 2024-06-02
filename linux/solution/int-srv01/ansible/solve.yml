@@ -256,7 +256,7 @@
   - name: Create jamie CSR
     community.crypto.openssl_csr_pipe:
       privatekey_path: /opt/grading/ca/jamie.key
-      common_name: jamie@dmz.worldskills.org
+      common_name: jamie.oliver@dmz.worldskills.org
       use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
       key_usage:
         - digitalSignature
