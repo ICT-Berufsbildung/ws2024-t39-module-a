@@ -1,4 +1,4 @@
-@   IN SOA int.worldskills.org. admin.int.worldskills.org. (
+@   IN SOA int-srv01.int.worldskills.org. admin.int.worldskills.org. (
         2023042701 ; Serial
         1d         ; Refresh
         2h         ; Retry

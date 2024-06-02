@@ -1,5 +1,5 @@
 $TTL 1h
-@   IN SOA int.worldskills.org. admin.dmz.worldskills.org. (
+@   IN SOA int-srv01.int.worldskills.org. admin.dmz.worldskills.org. (
         2023042702 ; Serial
         1d         ; Refresh
         2h         ; Retry
@@ -9,5 +9,5 @@ $TTL 1h
 ; Name Servers
         IN NS int-srv01.int.worldskills.org.
 ; PTR Records for reverse DNS
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0   IN PTR int-srv01.int.worldskills.org.
+0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0   IN PTR int-srv01.int.worldskills.org.
 

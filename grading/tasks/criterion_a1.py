@@ -19,7 +19,7 @@ class LDAP_ATTR(enum.StrEnum):
 
 def task_A1_01(task: Task) -> Result:
     """LDAP check"""
-    command = "nc -z -w3 localhost 389"
+    command = "echo -e '\x1dclose\x0d' | telnet 127.0.0.1 389 && echo -e '\x1dclose\x0d' | telnet ::1 389"
     try:
         task.run(task=paramiko_command, command=command)
         # Exit code is 0
