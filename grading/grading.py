@@ -1,7 +1,7 @@
 from processors.score_report import PrintScoreReport
 from nornir import InitNornir
 
-from tasks import criterion_a1, criterion_a2
+from tasks import criterion_a1, criterion_a2, criterion_a3
 
 nr = InitNornir(
     inventory={
@@ -26,7 +26,13 @@ tasks_to_run_int_srv = [
     criterion_a2.task_A2_04,
     criterion_a2.task_A2_05,
     criterion_a2.task_A2_06,
+    criterion_a3.task_A3_01,
+    criterion_a3.task_A3_02,
+    criterion_a3.task_A3_03,
+    criterion_a3.task_A3_04,
+    criterion_a3.task_A3_05,
+    criterion_a3.task_A3_06,
 ]
 # Run tasks
 for task in tasks_to_run_int_srv:
-    host_int_srv.run(task=task)
+    host_int_srv.run(task=task, on_failed=True)
