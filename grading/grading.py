@@ -1,7 +1,18 @@
 from processors.score_report import PrintScoreReport
 from nornir import InitNornir
+from nornir.core.filter import F
 
-from tasks import criterion_a1, criterion_a2, criterion_a3, criterion_a4
+
+from tasks import (
+    criterion_a1,
+    criterion_a2,
+    criterion_a3,
+    criterion_a4,
+    criterion_a5,
+    criterion_a6,
+    criterion_a7,
+    criterion_a8,
+)
 
 nr = InitNornir(
     inventory={
@@ -14,6 +25,8 @@ nr = InitNornir(
 ).with_processors([PrintScoreReport()])
 # Inventory filters
 host_int_srv = nr.filter(name="int-srv01")
+host_fw = nr.filter(name="fw")
+host_int_srv_vpn = nr.filter(F(name__eq="int-srv01") | F(name__eq="jamie-ws01"))
 tasks_to_run_int_srv = [
     criterion_a1.task_A1_01,
     criterion_a1.task_A1_02,
@@ -46,3 +59,11 @@ tasks_to_run_int_srv = [
 # Run tasks
 for task in tasks_to_run_int_srv:
     host_int_srv.run(task=task, on_failed=True)
+
+# Firewall checks
+tasks_to_run_fw = [criterion_a5.task_A5_01, criterion_a5.task_A5_02]
+for task in tasks_to_run_fw:
+    host_fw.run(task=task, on_failed=True)
+
+# Transparent Proxy checks
+host_int_srv_vpn.run(task=criterion_a8.task_A8_01, on_failed=True)
