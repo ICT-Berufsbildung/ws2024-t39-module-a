@@ -2,7 +2,7 @@ from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
 
-def task_A4_01(task: Task) -> Result:
+def task_A04_01(task: Task) -> Result:
     """DNS port check"""
     command = "echo -e '\x1dclose\x0d' | telnet 127.0.0.1 53 && echo -e '\x1dclose\x0d' | telnet ::1 53"
     score = 0
@@ -23,7 +23,7 @@ def task_A4_01(task: Task) -> Result:
     )
 
 
-def task_A4_02(task: Task) -> Result:
+def task_A04_02(task: Task) -> Result:
     """A int-srv01 check"""
     command = "dig +short +time=2 +tries=1 @127.0.0.1 int-srv01.int.worldskills.org A"
     score = 0
@@ -45,7 +45,7 @@ def task_A4_02(task: Task) -> Result:
     )
 
 
-def task_A4_03(task: Task) -> Result:
+def task_A04_03(task: Task) -> Result:
     """AAAA int-srv01 check"""
     command = (
         "dig +short +time=2 +tries=1 @127.0.0.1 int-srv01.int.worldskills.org AAAA"
@@ -69,7 +69,7 @@ def task_A4_03(task: Task) -> Result:
     )
 
 
-def task_A4_04(task: Task) -> Result:
+def task_A04_04(task: Task) -> Result:
     """PTR int-srv01 for IPv4 check"""
     command = "dig +short +time=2 +tries=1 @127.0.0.1 -x 10.1.10.10"
     score = 0
@@ -91,7 +91,7 @@ def task_A4_04(task: Task) -> Result:
     )
 
 
-def task_A4_05(task: Task) -> Result:
+def task_A04_05(task: Task) -> Result:
     """PTR int-srv01 for IPv4 check"""
     command = "dig +short +time=2 +tries=1 @127.0.0.1 -x 2001:db8:1001:10::10"
     score = 0
@@ -113,7 +113,7 @@ def task_A4_05(task: Task) -> Result:
     )
 
 
-def task_A4_06(task: Task) -> Result:
+def task_A04_06(task: Task) -> Result:
     """SRV int-srv01 check"""
     command = (
         "dig +short +time=2 +tries=1 @127.0.0.1 _ldap._tcp.auth.int.worldskills.org SRV"
@@ -137,7 +137,7 @@ def task_A4_06(task: Task) -> Result:
     )
 
 
-def task_A4_07(task: Task) -> Result:
+def task_A04_07(task: Task) -> Result:
     """SRV int-srv01 check"""
     command = "dig +recurse +time=2 +tries=1 @127.0.0.1 int.worldskills.org SOA"
     score = 0
@@ -159,7 +159,7 @@ def task_A4_07(task: Task) -> Result:
     )
 
 
-def task_A4_08(task: Task) -> Result:
+def task_A04_08(task: Task) -> Result:
     """Slave server check"""
     command = "rndc zonestatus dmz.worldskills.org."
     score = 0
@@ -191,7 +191,7 @@ def task_A4_08(task: Task) -> Result:
     )
 
 
-def task_A4_09(task: Task) -> Result:
+def task_A04_09(task: Task) -> Result:
     """Slave server for v4 reverse zone check"""
     command = "rndc zonestatus 20.1.10.in-addr.arpa."
     score = 0
@@ -222,7 +222,7 @@ def task_A4_09(task: Task) -> Result:
     )
 
 
-def task_A4_10(task: Task) -> Result:
+def task_A04_10(task: Task) -> Result:
     """Slave server for v4 reverse zone check"""
     command = "rndc zonestatus 0.2.0.0.1.0.0.1.8.b.d.0.1.0.0.2.ip6.arpa."
     score = 0

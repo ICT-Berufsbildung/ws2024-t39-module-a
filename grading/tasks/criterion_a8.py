@@ -2,7 +2,7 @@ from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
 
-def task_A8_01(task: Task) -> Result:
+def task_A08_01(task: Task) -> Result:
     """Check transparent proxy"""
     command = "curl -s -I --connect-timeout 3 http://10.1.20.10 2>&1"
     score = 0

@@ -2,7 +2,7 @@ from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
 
-def task_A3_01(task: Task) -> Result:
+def task_A03_01(task: Task) -> Result:
     """Samba user check"""
     command = "smbclient -L //localhost/ -I 127.0.0.1 -U jamie%Skill39"
     score = 0
@@ -23,7 +23,7 @@ def task_A3_01(task: Task) -> Result:
     )
 
 
-def task_A3_02(task: Task) -> Result:
+def task_A03_02(task: Task) -> Result:
     """Access public share without user"""
     command = 'smbclient //localhost/public -I 127.0.0.1 -U "%" -c ls 2>&1 || true'
     score = 0
@@ -50,7 +50,7 @@ def task_A3_02(task: Task) -> Result:
     )
 
 
-def task_A3_03(task: Task) -> Result:
+def task_A03_03(task: Task) -> Result:
     """Write on public share with user"""
     score = 0
     msg = "Cannot access public share with user."
@@ -76,7 +76,7 @@ def task_A3_03(task: Task) -> Result:
     )
 
 
-def task_A3_04(task: Task) -> Result:
+def task_A03_04(task: Task) -> Result:
     """Write on public share without user"""
     score = 0
     msg = "Cannot access public share."
@@ -99,7 +99,7 @@ def task_A3_04(task: Task) -> Result:
     )
 
 
-def task_A3_05(task: Task) -> Result:
+def task_A03_05(task: Task) -> Result:
     """Access internal share without user"""
     score = 0
     msg = "Can access internal share without user."
@@ -124,7 +124,7 @@ def task_A3_05(task: Task) -> Result:
     )
 
 
-def task_A3_06(task: Task) -> Result:
+def task_A03_06(task: Task) -> Result:
     """Write on internal share with user"""
     score = 0
     msg = "Cannot write on internal share with user"

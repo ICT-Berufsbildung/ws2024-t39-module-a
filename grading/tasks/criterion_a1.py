@@ -17,7 +17,7 @@ class LDAP_ATTR(enum.StrEnum):
     LOGIN_FAILED = "login"
 
 
-def task_A1_01(task: Task) -> Result:
+def task_A01_01(task: Task) -> Result:
     """LDAP check"""
     command = "echo -e '\x1dclose\x0d' | telnet 127.0.0.1 389 && echo -e '\x1dclose\x0d' | telnet ::1 389"
     try:
@@ -39,7 +39,7 @@ def task_A1_01(task: Task) -> Result:
     )
 
 
-def task_A1_02(task: Task) -> Result:
+def task_A01_02(task: Task) -> Result:
     """OU Employees exists"""
     ou_name = "Employees"
     base_command = f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=organizationalunit)(ou={ou_name}))"'
@@ -69,7 +69,7 @@ def task_A1_02(task: Task) -> Result:
     )
 
 
-def task_A1_03(task: Task) -> Result:
+def task_A01_03(task: Task) -> Result:
     """User Jamie exists"""
     username = "jamie"
     base_command = f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=inetOrgPerson)(uid={username}))"'
@@ -138,7 +138,7 @@ def task_A1_03(task: Task) -> Result:
     )
 
 
-def task_A1_04(task: Task) -> Result:
+def task_A01_04(task: Task) -> Result:
     """User peter exists"""
     username = "peter"
     base_command = f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=inetOrgPerson)(uid={username}))"'
@@ -207,7 +207,7 @@ def task_A1_04(task: Task) -> Result:
     )
 
 
-def task_A1_05(task: Task) -> Result:
+def task_A01_05(task: Task) -> Result:
     """User admin exists"""
     username = "admin"
     base_command = f'ldapsearch -H ldap://localhost -b cn={username},{BASE_DN} -x "(objectclass=*)"'

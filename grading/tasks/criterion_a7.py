@@ -2,7 +2,7 @@ from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
 
-def task_A7_01(task: Task) -> Result:
+def task_A07_01(task: Task) -> Result:
     """Check wireguard interface"""
     command = "wg show"
     score = 0
@@ -24,7 +24,7 @@ def task_A7_01(task: Task) -> Result:
     )
 
 
-def task_A7_02(task: Task) -> Result:
+def task_A07_02(task: Task) -> Result:
     """Check if PSK is configured for wg0"""
     command = "wg show wg0 preshared-keys"
     score = 0
@@ -45,7 +45,7 @@ def task_A7_02(task: Task) -> Result:
     )
 
 
-def task_A7_03(task: Task) -> Result:
+def task_A07_03(task: Task) -> Result:
     """Check IPv4 & IPv6 availabilties"""
     command = "wg show interfaces"
     score = 0
@@ -105,7 +105,7 @@ def task_A7_03(task: Task) -> Result:
     )
 
 
-def task_A7_04(task: Task) -> Result:
+def task_A07_04(task: Task) -> Result:
     """Check if wireguard is configured as systemd service"""
     command = "systemctl is-active wg-quick@wg0.service"
     score = 0

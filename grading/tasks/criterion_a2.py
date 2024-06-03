@@ -2,7 +2,7 @@ from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
 
-def task_A2_01(task: Task) -> Result:
+def task_A02_01(task: Task) -> Result:
     """Root CA check"""
     command = (
         "openssl x509 -in /opt/grading/ca/ca.pem -noout -ext basicConstraints,keyUsage"
@@ -31,7 +31,7 @@ def task_A2_01(task: Task) -> Result:
     )
 
 
-def task_A2_02(task: Task) -> Result:
+def task_A02_02(task: Task) -> Result:
     """Users CA check"""
     command = "openssl x509 -in /opt/grading/ca/users.pem -noout -ext basicConstraints,keyUsage"
     score = 0
@@ -65,7 +65,7 @@ def task_A2_02(task: Task) -> Result:
     )
 
 
-def task_A2_03(task: Task) -> Result:
+def task_A02_03(task: Task) -> Result:
     """Services CA check"""
     command = "openssl x509 -in /opt/grading/ca/services.pem -noout -ext basicConstraints,keyUsage"
     score = 0
@@ -99,7 +99,7 @@ def task_A2_03(task: Task) -> Result:
     )
 
 
-def task_A2_04(task: Task) -> Result:
+def task_A02_04(task: Task) -> Result:
     """jamie cert check"""
     command = "openssl x509 -in /opt/grading/ca/jamie.pem -noout -subject -ext keyUsage,extendedKeyUsage"
     score = 0
@@ -132,7 +132,7 @@ def task_A2_04(task: Task) -> Result:
     )
 
 
-def task_A2_05(task: Task) -> Result:
+def task_A02_05(task: Task) -> Result:
     """webserver cert check"""
     command = "openssl x509 -in /opt/grading/ca/web.pem -noout -subject"
     score = 0
@@ -162,7 +162,7 @@ def task_A2_05(task: Task) -> Result:
     )
 
 
-def task_A2_06(task: Task) -> Result:
+def task_A02_06(task: Task) -> Result:
     """mailserver cert check"""
     command = "openssl x509 -in /opt/grading/ca/mail.pem -noout -subject"
     score = 0

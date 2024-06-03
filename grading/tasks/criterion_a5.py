@@ -2,7 +2,7 @@ from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
 
-def task_A5_01(task: Task) -> Result:
+def task_A05_01(task: Task) -> Result:
     """IPv4 forwarding enabled check"""
     command = "sysctl -p"
     score = 0
@@ -24,7 +24,7 @@ def task_A5_01(task: Task) -> Result:
     )
 
 
-def task_A5_02(task: Task) -> Result:
+def task_A05_02(task: Task) -> Result:
     """IPv4 forwarding enabled check"""
     command = "sysctl -p"
     score = 0
