@@ -84,3 +84,16 @@ host_int_srv_vpn.run(task=criterion_a8.task_A08_01, on_failed=True)
 host_mail.run(criterion_a9.task_A09_01, on_failed=True)
 # E2E test
 host_jamie.run(criterion_a9.task_A09_02, on_failed=True)
+
+# Backup and LUKS checks
+task_to_run_mail = [
+    criterion_a10.task_A10_01,
+    criterion_a10.task_A10_02,
+    criterion_a10.task_A10_03,
+    criterion_a10.task_A10_04,
+    criterion_a10.task_A10_05,
+    criterion_a10.task_A10_06,
+]
+
+for task in task_to_run_mail:
+    host_mail.run(task=task, on_failed=True)
