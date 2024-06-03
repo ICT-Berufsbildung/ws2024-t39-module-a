@@ -1,8 +1,5 @@
 from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
-from nornir_paramiko.exceptions import CommandError
-
-# Wireguard
 
 
 def task_A7_01(task: Task) -> Result:
