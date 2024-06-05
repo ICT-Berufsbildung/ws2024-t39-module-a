@@ -13,6 +13,7 @@ from tasks import (
     criterion_a8,
     criterion_a9,
     criterion_a10,
+    criterion_a11,
 )
 
 nr = InitNornir(
@@ -28,6 +29,7 @@ nr = InitNornir(
 host_int_srv = nr.filter(name="int-srv01")
 host_fw = nr.filter(name="fw")
 host_mail = nr.filter(name="mail")
+host_ha_prx01 = nr.filter(name="ha-prx01")
 host_jamie = nr.filter(name="jamie-ws01")
 host_int_srv_vpn = nr.filter(F(name__eq="int-srv01") | F(name__eq="jamie-ws01"))
 
@@ -97,3 +99,7 @@ task_to_run_mail = [
 
 for task in task_to_run_mail:
     host_mail.run(task=task, on_failed=True)
+
+# SSH Cert based auth
+host_mail.run(task=criterion_a11.task_A11_01, on_failed=True)
+host_ha_prx01.run(task=criterion_a11.task_A11_02, on_failed=True)
