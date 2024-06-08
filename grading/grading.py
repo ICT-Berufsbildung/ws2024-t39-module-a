@@ -9,6 +9,7 @@ from tasks import (
     criterion_a3,
     criterion_a4,
     criterion_a5,
+    criterion_a6,
     criterion_a7,
     criterion_a8,
     criterion_a9,
@@ -73,12 +74,35 @@ for task in tasks_to_run_int_srv:
 tasks_to_run_fw = [
     criterion_a5.task_A05_01,
     criterion_a5.task_A05_02,
+]
+for task in tasks_to_run_fw:
+    host_fw.run(task=task, on_failed=True)
+
+# Port forwarding checks from WAN (jamie-ws)
+tasks_to_run_fw = [
+    criterion_a6.task_A06_01,
+    criterion_a6.task_A06_01,
+    criterion_a6.task_A06_03,
+]
+for task in tasks_to_run_fw:
+    host_jamie.run(task=task, on_failed=True)
+
+# Test SNAT
+snat_precheck_result = host_jamie.run(task=criterion_a6.task_A06_04a, on_failed=True)
+# Verify SNAT
+host_int_srv.run(
+    task=criterion_a6.task_A06_04,
+    on_failed=True,
+    cheated=snat_precheck_result["jamie-ws01"].result,
+)
+
+# Wireguard checks
+tasks_to_run_fw = [
     criterion_a7.task_A07_01,
     criterion_a7.task_A07_02,
 ]
 for task in tasks_to_run_fw:
     host_fw.run(task=task, on_failed=True)
-
 # VPN - E2E check
 host_jamie.run(task=criterion_a7.task_A07_03, on_failed=True)
 # VPN check
