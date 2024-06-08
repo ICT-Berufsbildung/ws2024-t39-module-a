@@ -3,7 +3,7 @@ from nornir_paramiko.plugins.tasks import paramiko_command
 
 
 def task_A10_01(task: Task) -> Result:
-    """Check if mail server is listening on port 143"""
+    """Check if LUKS exists on sdb"""
     command = "cryptsetup isLuks /dev/sdb"
     score = 0
     msg = "/dev/sdb is NOT encrypted"

@@ -26,7 +26,7 @@ def task_A14_01(task: Task) -> Result:
 
 
 def task_A14_02(task: Task) -> Result:
-    """Check if main.html is served"""
+    """Check if 404.html is served"""
     command = "curl -s --connect-timeout 2 http://127.0.0.1/loremipsum 2>&1"
     score = 0
     msg = f"404.html is NOT served as 404 page on {task.host}"
