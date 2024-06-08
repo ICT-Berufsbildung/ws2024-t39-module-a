@@ -51,14 +51,14 @@ ___] |___ |__| |  \ |___    |  \ |___ |    |__| |  \  |
                 continue
 
             # Get attributes
-            id = results.name.replace("task_", "")
-            score = getattr(results, "score", 0.0)
-            max_score = getattr(results, "max_score", 0.0)
+            id = res.name.replace("task_", "")
+            score = getattr(res, "score", 0.0)
+            max_score = getattr(res, "max_score", 0.0)
             color = Fore.GREEN if score == max_score else Fore.RED
 
             # print task
             intend = "".ljust(PREFIX_LENGTH)
-            output_formatted = f"\n{intend}".join(textwrap.wrap(results.result, 64))
+            output_formatted = f"\n{intend}".join(textwrap.wrap(res.result, 64))
             output_split = output_formatted.split("\n")
             padding_size = (
                 70 - len(output_split[-1])

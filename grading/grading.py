@@ -14,6 +14,7 @@ from tasks import (
     criterion_a9,
     criterion_a10,
     criterion_a11,
+    criterion_a12,
 )
 
 nr = InitNornir(
@@ -59,8 +60,6 @@ tasks_to_run_int_srv = [
     criterion_a4.task_A04_06,
     criterion_a4.task_A04_07,
     criterion_a4.task_A04_08,
-    criterion_a4.task_A04_09,
-    criterion_a4.task_A04_10,
 ]
 # Run tasks
 for task in tasks_to_run_int_srv:
@@ -103,3 +102,24 @@ for task in task_to_run_mail:
 # SSH Cert based auth
 host_mail.run(task=criterion_a11.task_A11_01, on_failed=True)
 host_ha_prx01.run(task=criterion_a11.task_A11_02, on_failed=True)
+
+# DNS checks for dmz.worldskills.org
+tasks_to_run_ha_prx01 = [
+    criterion_a12.task_A12_01,
+    criterion_a12.task_A12_02,
+    criterion_a12.task_A12_03,
+    criterion_a12.task_A12_04,
+    criterion_a12.task_A12_05,
+    criterion_a12.task_A12_06,
+    criterion_a12.task_A12_07,
+    criterion_a12.task_A12_08,
+    criterion_a12.task_A12_09,
+    criterion_a12.task_A12_10,
+    criterion_a12.task_A12_11,
+    criterion_a12.task_A12_12,
+    criterion_a12.task_A12_13,
+    criterion_a12.task_A12_14,
+    criterion_a12.task_A12_15,
+]
+for task in tasks_to_run_ha_prx01:
+    host_ha_prx01.run(task=task, on_failed=True)
