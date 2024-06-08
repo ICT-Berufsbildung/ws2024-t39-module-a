@@ -11,9 +11,9 @@ $TTL 1h
         IN NS ha-prx02.dmz.worldskills.org.
 
 ; PTR Records for reverse DNS
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.2.0   IN PTR mail.dmz.worldskills.org.
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.2.0   IN PTR prx-vrrp.dmz.worldskills.org.
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.2.0.2.0 IN PTR ha-prx01.dmz.worldskills.org.
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.2.0.2.0 IN PTR ha-prx02.dmz.worldskills.org.
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.3.2.0   IN PTR web01.dmz.worldskills.org.
-0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.3.2.0   IN PTR web02.dmz.worldskills.org.
+0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0   IN PTR mail.dmz.worldskills.org.
+0.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0   IN PTR prx-vrrp.dmz.worldskills.org.
+1.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0 IN PTR ha-prx01.dmz.worldskills.org.
+2.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0 IN PTR ha-prx02.dmz.worldskills.org.
+1.3.0.0.0.0.0.0.0.0.0.0.0.0.0.0   IN PTR web01.dmz.worldskills.org.
+2.3.0.0.0.0.0.0.0.0.0.0.0.0.0.0   IN PTR web02.dmz.worldskills.org.
