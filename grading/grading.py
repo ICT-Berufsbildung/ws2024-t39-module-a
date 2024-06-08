@@ -16,6 +16,7 @@ from tasks import (
     criterion_a11,
     criterion_a12,
     criterion_a13,
+    criterion_a14,
 )
 
 nr = InitNornir(
@@ -35,6 +36,7 @@ host_ha_prx01 = nr.filter(name="ha-prx01")
 host_ha_proxies = nr.filter(F(name__eq="ha-prx01") | F(name__eq="ha-prx02"))
 host_jamie = nr.filter(name="jamie-ws01")
 host_int_srv_vpn = nr.filter(F(name__eq="int-srv01") | F(name__eq="jamie-ws01"))
+host_web_servers = nr.filter(F(name__eq="web01") | F(name__eq="web02"))
 
 tasks_to_run_int_srv = [
     criterion_a1.task_A01_01,
@@ -106,9 +108,9 @@ host_mail.run(task=criterion_a11.task_A11_01, on_failed=True)
 host_ha_prx01.run(task=criterion_a11.task_A11_02, on_failed=True)
 
 # DNS checks for dmz.worldskills.org
+host_ha_proxies.run(task=criterion_a12.task_A12_01, on_failed=True)
+host_ha_proxies.run(task=criterion_a12.task_A12_02, on_failed=True)
 tasks_to_run_ha_prx01 = [
-    criterion_a12.task_A12_01,
-    criterion_a12.task_A12_02,
     criterion_a12.task_A12_03,
     criterion_a12.task_A12_04,
     criterion_a12.task_A12_05,
@@ -150,3 +152,7 @@ host_mail.run(
 )
 # Run VIP check
 host_mail.run(task=criterion_a13.task_A13_07, on_failed=True)
+
+# Web server checks
+host_web_servers.run(task=criterion_a14.task_A14_01, on_failed=True)
+host_web_servers.run(task=criterion_a14.task_A14_02, on_failed=True)

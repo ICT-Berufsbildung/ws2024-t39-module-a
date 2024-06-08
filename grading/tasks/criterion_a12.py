@@ -23,6 +23,33 @@ def task_A12_01(task: Task) -> Result:
 
 
 def task_A12_02(task: Task) -> Result:
+    """DNS zone check"""
+    command = "rndc zonestatus dmz.worldskills.org."
+    score = 0
+    msg = f"{task.host.name} is NOT secondary name server for dmz.worldskills.org"
+    if task.host.name == "ha-prx01":
+        msg = f"{task.host.name} is NOT primary name server for dmz.worldskills.org"
+    try:
+        cmd_result = task.run(task=paramiko_command, command=command)
+        if task.host.name == "ha-prx01" and "type: primary" in cmd_result.result:
+            msg = f"{task.host.name} is primary name server for dmz.worldskills.org"
+            score += 1
+        if task.host.name == "ha-prx02" and "type: secondary" in cmd_result.result:
+            msg = f"{task.host.name} is secondary name server for dmz.worldskills.org"
+            score += 1
+    except Exception:
+        score += 0
+
+    return Result(
+        host=task.host,
+        result=msg,
+        command_run=command,
+        score=score / 10,
+        max_score=0.1,
+    )
+
+
+def task_A12_03(task: Task) -> Result:
     """Recurse resolver check"""
     command = "dig +recurse +time=2 +tries=1 @127.0.0.1 int.worldskills.org SOA"
     score = 0
@@ -44,7 +71,7 @@ def task_A12_02(task: Task) -> Result:
     )
 
 
-def task_A12_03(task: Task) -> Result:
+def task_A12_04(task: Task) -> Result:
     """A record for mail check"""
     hostname = "mail.dmz.worldskills.org."
     ip_addr = "10.1.20.10"
@@ -61,7 +88,7 @@ def task_A12_03(task: Task) -> Result:
     )
 
 
-def task_A12_04(task: Task) -> Result:
+def task_A12_05(task: Task) -> Result:
     """A record for prx-vrrp check"""
     result = check_host_record(
         task=task,
@@ -79,7 +106,7 @@ def task_A12_04(task: Task) -> Result:
     )
 
 
-def task_A12_05(task: Task) -> Result:
+def task_A12_06(task: Task) -> Result:
     """A record for ha-prx01 check"""
     result = check_host_record(
         task=task,
@@ -97,7 +124,7 @@ def task_A12_05(task: Task) -> Result:
     )
 
 
-def task_A12_06(task: Task) -> Result:
+def task_A12_07(task: Task) -> Result:
     """A record for ha-prx02 check"""
     result = check_host_record(
         task=task,
@@ -115,7 +142,7 @@ def task_A12_06(task: Task) -> Result:
     )
 
 
-def task_A12_07(task: Task) -> Result:
+def task_A12_08(task: Task) -> Result:
     """A record for web01 check"""
     result = check_host_record(
         task=task,
@@ -133,7 +160,7 @@ def task_A12_07(task: Task) -> Result:
     )
 
 
-def task_A12_08(task: Task) -> Result:
+def task_A12_09(task: Task) -> Result:
     """A record for web02 check"""
     result = check_host_record(
         task=task,
@@ -151,7 +178,7 @@ def task_A12_08(task: Task) -> Result:
     )
 
 
-def task_A12_09(task: Task) -> Result:
+def task_A12_10(task: Task) -> Result:
     """AAAA record for mail check"""
     hostname = "mail.dmz.worldskills.org."
     ip_addr = "2001:db8:1001:20::10"
@@ -171,7 +198,7 @@ def task_A12_09(task: Task) -> Result:
     )
 
 
-def task_A12_10(task: Task) -> Result:
+def task_A12_11(task: Task) -> Result:
     """AAAA record for prx-vrrp check"""
     result = check_host_record(
         task=task,
@@ -189,7 +216,7 @@ def task_A12_10(task: Task) -> Result:
     )
 
 
-def task_A12_11(task: Task) -> Result:
+def task_A12_12(task: Task) -> Result:
     """AAAA record for ha-prx01 check"""
     result = check_host_record(
         task=task,
@@ -207,7 +234,7 @@ def task_A12_11(task: Task) -> Result:
     )
 
 
-def task_A12_12(task: Task) -> Result:
+def task_A12_13(task: Task) -> Result:
     """AAAA record for ha-prx02 check"""
     result = check_host_record(
         task=task,
@@ -225,7 +252,7 @@ def task_A12_12(task: Task) -> Result:
     )
 
 
-def task_A12_13(task: Task) -> Result:
+def task_A12_14(task: Task) -> Result:
     """AAAA record for web01 check"""
     result = check_host_record(
         task=task,
@@ -243,7 +270,7 @@ def task_A12_13(task: Task) -> Result:
     )
 
 
-def task_A12_14(task: Task) -> Result:
+def task_A12_15(task: Task) -> Result:
     """AAAA record for web02 check"""
     result = check_host_record(
         task=task,
@@ -261,7 +288,7 @@ def task_A12_14(task: Task) -> Result:
     )
 
 
-def task_A12_15(task: Task) -> Result:
+def task_A12_16(task: Task) -> Result:
     """CNAME record for web check"""
     result = check_dns_record(
         task=task,

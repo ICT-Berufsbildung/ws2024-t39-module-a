@@ -17,10 +17,10 @@ def check_dns_port_listen(task: Task) -> SubAspectResult:
     """DNS port check"""
     command = "echo -e '\x1dclose\x0d' | telnet 127.0.0.1 53 && echo -e '\x1dclose\x0d' | telnet ::1 53"
     score = 0
-    msg = "DNS is not listening on IPv4 AND IPv6"
+    msg = f"{task.host.name} is not listening on tcp/53 for IPv4 AND IPv6"
     try:
         task.run(task=paramiko_command, command=command)
-        msg = "DNS is listening on IPv4 & IPv6."
+        msg = f"{task.host.name} is listening on tcp/53 for IPv4 AND IPv6"
         score = 1
     except Exception:
         score = 0
