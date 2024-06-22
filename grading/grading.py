@@ -46,6 +46,14 @@ parser.add_argument(
     default=[],
     help="run only given tasks",
 )
+parser.add_argument(
+    "-v",
+    "--verbose",
+    action=argparse.BooleanOptionalAction,
+    dest="verbose",
+    default=False,
+    help="Enable verbose mode: prints the executed command as well.",
+)
 
 args = parser.parse_args()
 
@@ -63,7 +71,7 @@ nr = (
         },  # Store the task tags to run
     )
     .with_processors(
-        [PrintScoreReport()]
+        [PrintScoreReport(args.verbose)]
     )  # Custom output handler. Prints the score report
     .with_runner(
         ThreadedTagRunner()
@@ -121,7 +129,7 @@ for task in tasks_to_run_fw:
 # Port forwarding checks from WAN (jamie-ws)
 tasks_to_run_fw = [
     criterion_a6.task_A06_01,
-    criterion_a6.task_A06_01,
+    criterion_a6.task_A06_02,
     criterion_a6.task_A06_03,
 ]
 for task in tasks_to_run_fw:
@@ -134,6 +142,10 @@ host_int_srv.run(
     task=criterion_a6.task_A06_04,
     on_failed=True,
     cheated=snat_precheck_result["jamie-ws01"].result,
+    check_command=getattr(snat_precheck_result["jamie-ws01"], "command", ""),
+    check_command_output=getattr(
+        snat_precheck_result["jamie-ws01"], "command_output", ""
+    ),
 )
 
 # Wireguard checks
@@ -143,10 +155,12 @@ tasks_to_run_fw = [
 ]
 for task in tasks_to_run_fw:
     host_fw.run(task=task, on_failed=True)
-# VPN - E2E check
+# VPN - IPv4 & IPv6 route check
 host_jamie.run(task=criterion_a7.task_A07_03, on_failed=True)
 # VPN check
 host_fw.run(task=criterion_a7.task_A07_04, on_failed=True)
+# VPN - E2E check
+host_jamie.run(task=criterion_a7.task_A07_05, on_failed=True)
 # Transparent Proxy checks
 host_int_srv_vpn.run(task=criterion_a8.task_A08_01, on_failed=True)
 # Mail test
@@ -180,17 +194,13 @@ tasks_to_run_ha_prx01 = [
     criterion_a12.task_A12_05,
     criterion_a12.task_A12_06,
     criterion_a12.task_A12_07,
-    criterion_a12.task_A12_08,
-    criterion_a12.task_A12_09,
-    criterion_a12.task_A12_10,
-    criterion_a12.task_A12_11,
-    criterion_a12.task_A12_12,
-    criterion_a12.task_A12_13,
-    criterion_a12.task_A12_14,
-    criterion_a12.task_A12_15,
 ]
 for task in tasks_to_run_ha_prx01:
     host_ha_prx01.run(task=task, on_failed=True)
+
+tasks_to_run_for_reverse_proxy = [criterion_a13.task_A13_01, criterion_a13.task_A13_02]
+for task in tasks_to_run_for_reverse_proxy:
+    host_ha_proxies.run(task=task)
 
 # Check high available reverse proxy
 tasks_to_run_for_reverse_proxy = [
@@ -213,6 +223,10 @@ host_mail.run(
     task=criterion_a13.task_A13_06,
     on_failed=True,
     certificate_fingerprint=cert_fingerprint_result["int-srv01"].result,
+    check_command=getattr(cert_fingerprint_result["int-srv01"], "command", ""),
+    check_command_output=getattr(
+        cert_fingerprint_result["int-srv01"], "command_output", ""
+    ),
 )
 # Run VIP check
 host_mail.run(task=criterion_a13.task_A13_07, on_failed=True)

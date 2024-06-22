@@ -1,18 +1,21 @@
 from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
+from tasks.common.helper import UNKNOWN_MSG
+
 
 def task_A09_01(task: Task) -> Result:
     """Check if mail server is listening on port 143"""
     command = "ss -tulpen | grep 143"
     score = 0
+    cmd_result = None
     msg = "No mail server listening on port 143"
     v4_enabled = False
     try:
         cmd_result = task.run(task=paramiko_command, command=command)
         if "0.0.0.0:143" in cmd_result.result:
             msg = "Mail server is reachable over IPv4 on tcp/143"
-            score += 1
+            score += 0.05
             v4_enabled = True
         if "[::]:143" in cmd_result.result:
             msg = (
@@ -20,39 +23,42 @@ def task_A09_01(task: Task) -> Result:
                 if v4_enabled
                 else "Mail server is reachable over IPv6 only on tcp/143"
             )
-            score += 1
+            score += 0.05
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=command,
-        score=score / 10,
-        max_score=0.2,
+        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
+        score=score,
+        max_score=0.1,
     )
 
 
 def task_A09_02(task: Task) -> Result:
     """Check STARTTLS on port 143"""
-    command = "timeout 2 bash -c 'echo \"Q\" | openssl s_client -connect 10.1.20.10:143 -verify_return_error -starttls imap' 2>&1"
+    command = """timeout 2 bash -c 'echo "Q" | openssl s_client -connect 10.1.20.10:143 -verify_return_error -starttls imap' 2>&1"""
     score = 0
+    cmd_result = None
     msg = "STARTTLS over IMAP not available on mailserver. "
     try:
         cmd_result = task.run(task=paramiko_command, command=command)
         if "Verification: OK" in cmd_result.result:
             msg = "Certificate is valid."
-            score += 1
+            score += 0.1
         if "CN = ClearSky Root CA" in cmd_result.result:
             msg += " Signed by ClearSky Root CA"
-            score += 1
+            score += 0.1
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=command,
-        score=score / 10,
+        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
+        score=score,
         max_score=0.2,
     )

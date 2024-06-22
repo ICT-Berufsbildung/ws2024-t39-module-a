@@ -1,6 +1,8 @@
 from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
+from tasks.common.helper import process_result_exit_code
+
 
 def task_A03_01(task: Task) -> Result:
     """Samba user check"""
@@ -10,16 +12,17 @@ def task_A03_01(task: Task) -> Result:
     try:
         task.run(task=paramiko_command, command=command)
         msg = "jamie can login on Samba share."
-        score += 1
+        score = 0.5
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=command,
-        score=score / 10,
-        max_score=0.1,
+        command_output=process_result_exit_code(score != 0),
+        score=score,
+        max_score=0.5,
     )
 
 
@@ -36,17 +39,18 @@ def task_A03_02(task: Task) -> Result:
             ".." in cmd_result.result
             and "NT_STATUS_ACCESS_DENIED" not in cmd_result.result
         ):
-            score += 1
+            score = 0.25
             msg = "public share can be accessed without user."
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=command,
-        score=score / 10,
-        max_score=0.1,
+        command_output=cmd_result.result,
+        score=score,
+        max_score=0.25,
     )
 
 
@@ -62,17 +66,18 @@ def task_A03_03(task: Task) -> Result:
             "NT_STATUS_ACCESS_DENIED" not in cmd_result.result
             and "average" in cmd_result.result
         ):
-            score += 1
+            score = 0.25
             msg = "Public share is writable with user"
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=write_command,
-        score=score / 10,
-        max_score=0.1,
+        command_output=cmd_result.result,
+        score=score,
+        max_score=0.25,
     )
 
 
@@ -85,17 +90,18 @@ def task_A03_04(task: Task) -> Result:
         cmd_result = task.run(task=paramiko_command, command=write_command)
         # Check if there is not login failure
         if "NT_STATUS_ACCESS_DENIED" in cmd_result.result:
-            score += 1
+            score = 0.25
             msg = "Public share is not writable without user."
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=write_command,
-        score=score / 10,
-        max_score=0.1,
+        command_output=cmd_result.result,
+        score=score,
+        max_score=0.25,
     )
 
 
@@ -110,17 +116,18 @@ def task_A03_05(task: Task) -> Result:
         cmd_result = task.run(task=paramiko_command, command=write_command)
         # Check if there is not login failure
         if "NT_STATUS_ACCESS_DENIED" in cmd_result.result:
-            score += 1
+            score = 0.25
             msg = "Internal share is not accessible without user"
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=write_command,
-        score=score / 10,
-        max_score=0.1,
+        command_output=cmd_result.result,
+        score=score,
+        max_score=0.25,
     )
 
 
@@ -136,15 +143,16 @@ def task_A03_06(task: Task) -> Result:
             "NT_STATUS_ACCESS_DENIED" not in cmd_result.result
             and "average" in cmd_result.result
         ):
-            score += 1
+            score = 0.25
             msg = "Internal share is writable with user"
     except Exception:
-        score += 0
+        pass
 
     return Result(
         host=task.host,
         result=msg,
         command_run=write_command,
-        score=score / 10,
-        max_score=0.1,
+        command_output=cmd_result.result,
+        score=score,
+        max_score=0.25,
     )

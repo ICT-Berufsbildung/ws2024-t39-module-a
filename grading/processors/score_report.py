@@ -52,9 +52,11 @@ ___] |___ |__| |  \ |___    |  \ |___ |    |__| |  \  |
 
             # Get attributes
             id = res.name.replace("task_", "")
-            score = getattr(res, "score", 0.0)
+            score = round(getattr(res, "score", 0.0), 2)
             max_score = getattr(res, "max_score", 0.0)
             color = Fore.GREEN if score == max_score else Fore.RED
+            # Either full points or zero points
+            score = max_score if score == max_score else 0.0
 
             # print task
             intend = "".ljust(PREFIX_LENGTH)
@@ -67,6 +69,39 @@ ___] |___ |__| |  \ |___    |  \ |___ |    |__| |  \  |
             )
             msg = f"=> [{id}] {output_formatted}: {''.ljust(padding_size)}{Style.BRIGHT}{color}{score}"
             print(msg)
+            # If verbose is enabled, print the command as well the command output
+            if self.verbose:
+                command_color = Fore.CYAN
+                command_output_color = Fore.BLUE
+                executed_commands = getattr(res, "command_run", "<unknown>")
+                command_results = getattr(res, "command_output", "<unknown>")
+                # Check if multiple commands needed to be print or just single command
+                if isinstance(executed_commands, list):
+                    for i, c in enumerate(executed_commands):
+                        # Print command
+                        try:
+                            print(
+                                f"{Style.BRIGHT}{command_color}Executed command on {host} =>\n$ {executed_commands[i]}"
+                            )
+                        except IndexError:
+                            print(
+                                f"{Style.BRIGHT}{command_color}Unknown command on {host}!"
+                            )
+                        # Print command output
+                        try:
+                            print(
+                                f"{Style.BRIGHT}{command_output_color}{command_results[i]}"
+                            )
+                        except IndexError:
+                            print(
+                                f"{Style.BRIGHT}{command_output_color}Unknown command output!"
+                            )
+                            continue
+                else:
+                    print(
+                        f"{Style.BRIGHT}{command_color}Executed command on {host} =>\n$ {executed_commands}"
+                    )
+                    print(f"{Style.BRIGHT}{command_output_color}> {command_results}")
             placeholder = "=" if self.even else "-"
             self.even = not self.even
             print(f"{placeholder * (75)}")
