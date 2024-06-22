@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+import argparse
+import signal
+import sys
+from runner.tag_runner import ThreadedTagRunner
 from processors.score_report import PrintScoreReport
 from nornir import InitNornir
 from nornir.core.filter import F
-
 
 from tasks import (
     criterion_a1,
@@ -20,15 +24,51 @@ from tasks import (
     criterion_a14,
 )
 
-nr = InitNornir(
-    inventory={
-        "plugin": "SimpleInventory",
-        "options": {
-            "host_file": "inventory/hosts.yaml",
-            "defaults_file": "inventory/defaults.yaml",
+
+def signal_handler(signal, frame):
+    print("\n\nAborted by the user!")
+    sys.exit(0)
+
+
+# Register ctrl+c handler
+signal.signal(signal.SIGINT, signal_handler)
+
+parser = argparse.ArgumentParser(
+    prog="grading.py",
+    description="Worldskills competition 2024 Module A (Linux) grading script",
+)
+parser.add_argument(
+    "-t",
+    "--tags",
+    metavar="N",
+    dest="run_tags",
+    nargs="*",
+    default=[],
+    help="run only given tasks",
+)
+
+args = parser.parse_args()
+
+nr = (
+    InitNornir(
+        inventory={
+            "plugin": "SimpleInventory",
+            "options": {
+                "host_file": "inventory/hosts.yaml",
+                "defaults_file": "inventory/defaults.yaml",
+            },
         },
-    }
-).with_processors([PrintScoreReport()])
+        user_defined={
+            "run_tags": [f"task_{tag.upper()}" for tag in args.run_tags]
+        },  # Store the task tags to run
+    )
+    .with_processors(
+        [PrintScoreReport()]
+    )  # Custom output handler. Prints the score report
+    .with_runner(
+        ThreadedTagRunner()
+    )  # Tag Handler. Runs only tasks if a tag is set or no tags are set
+)
 # Inventory filters
 host_int_srv = nr.filter(name="int-srv01")
 host_fw = nr.filter(name="fw")
