@@ -149,19 +149,23 @@ def task_A10_06(task: Task) -> Result:
     command = "rm -rf /opt/backup/* ; bash /opt/backup.sh"
     score = 0
     cmd_result = None
+    commands = [command]
+    command_outputs = []
     msg = "Backup script not found"
     categories = []
     try:
         task.run(task=paramiko_command, command=command)
+        command_outputs.append(process_result_exit_code(True))
     except Exception:
-        # not exit code 0
-        score += 0
+        command_outputs.append(process_result_exit_code(False))
 
     command = (
         "find /opt/backup/ -name dovecot.conf -o -name main.cf -o -name dovecot.index*"
     )
+    commands.append(command)
     try:
         cmd_result = task.run(task=paramiko_command, command=command)
+        command_outputs.append(cmd_result.result)
         if "main.cf" in cmd_result.result:
             score += 0.5
             categories.append("postfix")
@@ -172,8 +176,15 @@ def task_A10_06(task: Task) -> Result:
             score += 1
             categories.append("mailboxes")
     except Exception:
-        # not exit code 0
-        score += 0
+        command_outputs.append(UNKNOWN_MSG)
+
+    command = "cat /opt/backup.sh"
+    commands.append(command)
+    try:
+        cmd_result = task.run(task=paramiko_command, command=command)
+        command_outputs.append(cmd_result.result)
+    except Exception:
+        command_outputs.append(UNKNOWN_MSG)
 
     if categories:
         msg = f"Backup script is working. {', '.join(categories)} are backed up"
@@ -181,8 +192,8 @@ def task_A10_06(task: Task) -> Result:
     return Result(
         host=task.host,
         result=msg,
-        command_run=command,
-        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
+        command_run=commands,
+        command_output=command_outputs,
         score=score,
         max_score=2.0,
     )

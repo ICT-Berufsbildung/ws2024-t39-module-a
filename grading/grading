@@ -2,6 +2,8 @@
 import argparse
 import signal
 import sys
+import os
+
 from runner.tag_runner import ThreadedTagRunner
 from processors.score_report import PrintScoreReport
 from nornir import InitNornir
@@ -24,7 +26,13 @@ from tasks import (
     criterion_a14,
 )
 
+# Set working dir
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
+
+# Keyboard interrupt handler
 def signal_handler(signal, frame):
     print("\n\nAborted by the user!")
     sys.exit(0)
@@ -52,7 +60,7 @@ parser.add_argument(
     action=argparse.BooleanOptionalAction,
     dest="verbose",
     default=False,
-    help="Enable verbose mode: prints the executed command as well.",
+    help="Enable verbose mode: prints the executed command and the command output as well.",
 )
 
 args = parser.parse_args()
@@ -167,6 +175,10 @@ host_int_srv_vpn.run(task=criterion_a8.task_A08_01, on_failed=True)
 host_mail.run(criterion_a9.task_A09_01, on_failed=True)
 # E2E test
 host_jamie.run(criterion_a9.task_A09_02, on_failed=True)
+# Send and receive mail
+host_mail.run(criterion_a9.task_A09_03, on_failed=True)
+# Send and receive echo mail
+host_mail.run(criterion_a9.task_A09_04, on_failed=True)
 
 # Backup and LUKS checks
 task_to_run_mail = [
