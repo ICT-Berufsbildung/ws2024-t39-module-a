@@ -2,4 +2,3 @@ requests
 nornir
 nornir_utils
 nornir_paramiko
-python-ldap
