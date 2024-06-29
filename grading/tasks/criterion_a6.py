@@ -127,7 +127,7 @@ def task_A06_04(
             max_score=0.1,
         )
 
-    command = "timeout 2  bash -c \"echo -e '\x1dclose\x0d' | telnet 1.1.1.20 22\""
+    command = r"""timeout 2  bash -c "echo -e '\x1dclose\x0d' | telnet 1.1.1.20 22" """
     score = 0
     cmd_result = None
     msg = "SNAT is not working on fw01"

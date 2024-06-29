@@ -1,22 +1,17 @@
-import enum
-import re
 from nornir.core.task import Task, Result
 from nornir_paramiko.plugins.tasks import paramiko_command
 
+from tasks.common.ldap_checks import (
+    check_ldap_login,
+    check_ldap_user_attributes,
+    check_ldap_user_exists,
+)
 from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 
 
 BASE_DN = "dc=int,dc=worldskills,dc=org"
 ADMIN_DN = "cn=admin,dc=int,dc=worldskills,dc=org"
 ADMIN_PW = "Skill39"
-
-
-class LDAP_ATTR(enum.StrEnum):
-    MAIL_EXISTS = "mail"
-    OU_EXISTS = "ou"
-    UID_EXISTS = "uid"
-    CN_EXISTS = "cn"
-    LOGIN_FAILED = "login"
 
 
 def task_A01_01(task: Task) -> Result:
@@ -75,214 +70,56 @@ def task_A01_02(task: Task) -> Result:
 
 
 def task_A01_03(task: Task) -> Result:
-    """User Jamie exists"""
-    username = "jamie"
-    base_command = f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=inetOrgPerson)(uid={username}))"'
-    command_with_user = f"{base_command} -D {ADMIN_DN} -w {ADMIN_PW}"
-    command = f"({command_with_user} || {base_command}) 2>&1"
-    missing_attr = []
-    cn = ""
-    score = 0
-    commands = [command]
-    command_outputs = []
-    try:
-        # Redirect stderr to stdout
-        cmd_result = task.run(task=paramiko_command, command=command)
-        command_outputs.append(cmd_result.result)
-        # Check if ou exits
-        if "uid: jamie\n" not in cmd_result.result:
-            missing_attr.append(LDAP_ATTR.UID_EXISTS)
-
-        # Mail attribute is set
-        if "mail: jamie.oliver@dmz.worldskills.org\n" not in cmd_result.result:
-            missing_attr.append(LDAP_ATTR.MAIL_EXISTS)
-
-        # member of OU Employees
-        if "ou=Employees,dc=int,dc=worldskills,dc=org" not in cmd_result.result:
-            missing_attr.append(LDAP_ATTR.OU_EXISTS)
-
-        if len(missing_attr) == 0:
-            score = 0.2
-
-        # Get configured DN for the user
-        re_cn = re.findall(r"^dn: (.*)$", str(cmd_result.result), re.MULTILINE)
-        if len(re_cn) > 0:
-            cn = re_cn[0]
-        else:
-            missing_attr.append(LDAP_ATTR.CN_EXISTS)
-    except Exception:
-        command_outputs.append(UNKNOWN_MSG)
-
-    login_works = False
-    if cn:
-        # Try to login
-        login_command = f"{base_command} -D {cn} -w {ADMIN_PW}"
-        commands.append(login_command)
-        try:
-            task.run(task=paramiko_command, command=f"{login_command}")
-            score += 0.1
-            login_works = True
-        except Exception:
-            # Login failed
-            missing_attr.append(LDAP_ATTR.LOGIN_FAILED)
-        command_outputs.append(process_result_exit_code(login_works))
-    # Prepare message
-    msg = "User jamie DOES NOT exists"
-    if login_works and cn:
-        msg = "User Jamie exists and can login"
-    elif cn and not login_works:
-        msg = "User Jamie exists, but cannot login"
-    elif score != 0:
-        msg = (
-            f"User jamie exists, but attributes are missing: {', '.join(missing_attr)}"
-        )
-    else:
-        msg = "User jamie DOES NOT exists"
+    """Check if user jamie, peter and admin exists"""
+    results = [check_ldap_user_exists(task=task, username="jamie")]
+    results.append(check_ldap_user_exists(task=task, username="peter"))
+    results.append(check_ldap_user_exists(task=task, username="admin"))
 
     return Result(
         host=task.host,
-        result=msg,
-        command_run=commands,
-        command_output=command_outputs,
-        score=score,
-        max_score=0.3,
+        result=", ".join([res["msg"] for res in results]),
+        command_run=[res["command"] for res in results],
+        command_output=[res["command_output"] for res in results],
+        score=0.2 if sum([res["score"] for res in results]) == 3 else 0.0,
+        max_score=0.2,
     )
 
 
 def task_A01_04(task: Task) -> Result:
-    """User peter exists"""
-    username = "peter"
-    base_command = f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=inetOrgPerson)(uid={username}))"'
-    command_with_user = f"{base_command} -D {ADMIN_DN} -w {ADMIN_PW}"
-    command = f"({command_with_user} || {base_command}) 2>&1"
-    missing_attr = []
-    cn = ""
-    score = 0
-    commands = [command]
-    command_outputs = []
-    try:
-        # Redirect stderr to stdout
-        cmd_result = task.run(task=paramiko_command, command=command)
-        command_outputs.append(cmd_result.result)
-        # Check if ou exits
-        if "uid: peter\n" not in cmd_result.result:
-            missing_attr.append(LDAP_ATTR.UID_EXISTS)
+    """Check if user jamie and peter have correct attributes"""
 
-        # Mail attribute is set
-        if "mail: peter.fox@dmz.worldskills.org\n" not in cmd_result.result:
-            missing_attr.append(LDAP_ATTR.MAIL_EXISTS)
-
-        # member of OU Employees
-        if "ou=Employees,dc=int,dc=worldskills,dc=org" not in cmd_result.result:
-            missing_attr.append(LDAP_ATTR.OU_EXISTS)
-
-        if len(missing_attr) == 0:
-            score = 0.2
-
-        # Get configured DN for the user
-        re_cn = re.findall(r"^dn: (.*)$", str(cmd_result.result), re.MULTILINE)
-        if len(re_cn) > 0:
-            cn = re_cn[0]
-        else:
-            missing_attr.append(LDAP_ATTR.CN_EXISTS)
-    except Exception:
-        command_outputs.append(UNKNOWN_MSG)
-
-    login_works = False
-    if cn:
-        # Try to login
-        login_command = f"{base_command} -D {cn} -w {ADMIN_PW}"
-        commands.append(login_command)
-        try:
-            task.run(task=paramiko_command, command=f"{login_command}")
-            score += 0.1
-            login_works = True
-        except Exception:
-            # Login failed
-            missing_attr.append(LDAP_ATTR.LOGIN_FAILED)
-        command_outputs.append(process_result_exit_code(login_works))
-    # Prepare message
-    msg = "User peter DOES NOT exists"
-    if login_works and cn:
-        msg = "User peter exists and can login"
-    elif cn and not login_works:
-        msg = "User peter exists, but cannot login"
-    elif score != 0:
-        msg = (
-            f"User peter exists, but attributes are missing: {', '.join(missing_attr)}"
+    results = [
+        check_ldap_user_attributes(
+            task=task, username="jamie", mail="jamie.oliver@dmz.worldskills.org"
         )
-    else:
-        msg = "User peter DOES NOT exists"
+    ]
+    results.append(
+        check_ldap_user_attributes(
+            task=task, username="peter", mail="peter.fox@dmz.worldskills.org"
+        )
+    )
 
     return Result(
         host=task.host,
-        result=msg,
-        command_run=commands,
-        command_output=command_outputs,
-        score=score,
-        max_score=0.3,
+        result=", ".join([res["msg"] for res in results]),
+        command_run=[res["command"] for res in results],
+        command_output=[res["command_output"] for res in results],
+        score=0.4 if sum([res["score"] for res in results]) == 2 else 0.0,
+        max_score=0.4,
     )
 
 
 def task_A01_05(task: Task) -> Result:
-    """User admin exists"""
-    username = "admin"
-    base_command = f'ldapsearch -H ldap://localhost -b cn={username},{BASE_DN} -x "(objectclass=*)"'
-    command_with_user = f"{base_command} -D {ADMIN_DN} -w {ADMIN_PW}"
-    command = f"({command_with_user} || {base_command}) 2>&1"
-    missing_attr = []
-    cn = ""
-    score = 0
-    commands = [command]
-    command_outputs = []
-    try:
-        # Redirect stderr to stdout
-        cmd_result = task.run(task=paramiko_command, command=command)
-        command_outputs.append(cmd_result.result)
-
-        # Get configured DN for the user
-        re_cn = re.findall(r"^dn: (.*)$", str(cmd_result.result), re.MULTILINE)
-        if len(re_cn) > 0:
-            cn = re_cn[0]
-        else:
-            missing_attr.append(LDAP_ATTR.CN_EXISTS)
-        # Check if ou exits
-        if f"dn: cn={username},{BASE_DN}\n" in cmd_result.result:
-            score += 0.1
-    except Exception:
-        command_outputs.append(UNKNOWN_MSG)
-
-    login_works = False
-    if cn:
-        # Try to login
-        login_command = f"{base_command} -D {cn} -w {ADMIN_PW}"
-        commands.append(login_command)
-        try:
-            task.run(task=paramiko_command, command=f"{login_command}")
-            score += 0.1
-            login_works = True
-        except Exception:
-            # Login failed
-            missing_attr.append(LDAP_ATTR.LOGIN_FAILED)
-        command_outputs.append(process_result_exit_code(login_works))
-    # Prepare message
-    msg = "User admin DOES NOT exists"
-    if login_works and cn:
-        msg = "User admin exists and can login"
-    elif cn and not login_works:
-        msg = "User admin exists, but cannot login"
-    elif score != 0:
-        msg = (
-            f"User admin exists, but attributes are missing: {', '.join(missing_attr)}"
-        )
-    else:
-        msg = "User admin DOES NOT exists"
+    """Check if ldap users can login"""
+    results = [check_ldap_login(task=task, username="jamie")]
+    results.append(check_ldap_login(task=task, username="peter"))
+    results.append(check_ldap_login(task=task, username="admin"))
 
     return Result(
         host=task.host,
-        result=msg,
-        command_run=commands,
-        command_output=command_outputs,
-        score=score,
-        max_score=0.2,
+        result=", ".join([res["msg"] for res in results]),
+        command_run=[item for res in results for item in res["command"]],
+        command_output=[item for res in results for item in res["command_output"]],
+        score=0.25 if sum([res["score"] for res in results]) == 3 else 0.0,
+        max_score=0.25,
     )

@@ -93,7 +93,7 @@ host_ha_prx01 = nr.filter(name="ha-prx01")
 host_ha_proxies = nr.filter(F(name__eq="ha-prx01") | F(name__eq="ha-prx02"))
 host_jamie = nr.filter(name="jamie-ws01")
 host_int_srv_vpn = nr.filter(F(name__eq="int-srv01") | F(name__eq="jamie-ws01"))
-host_web_servers = nr.filter(F(name__eq="web01") | F(name__eq="web02"))
+host_web01 = nr.filter(name="web01")
 
 tasks_to_run_int_srv = [
     criterion_a1.task_A01_01,
@@ -244,5 +244,5 @@ host_mail.run(
 host_mail.run(task=criterion_a13.task_A13_07, on_failed=True)
 
 # Web server checks
-host_web_servers.run(task=criterion_a14.task_A14_01, on_failed=True)
-host_web_servers.run(task=criterion_a14.task_A14_02, on_failed=True)
+host_web01.run(task=criterion_a14.task_A14_01, on_failed=True)
+host_web01.run(task=criterion_a14.task_A14_02, on_failed=True)

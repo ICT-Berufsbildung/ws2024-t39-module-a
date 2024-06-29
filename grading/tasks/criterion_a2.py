@@ -111,7 +111,7 @@ def task_A02_03(task: Task) -> Result:
 
 
 def task_A02_04(task: Task) -> Result:
-    """jamie cert check"""
+    """Check jamie cert exists and signed by CA"""
     command = "openssl x509 -in /opt/grading/ca/jamie.pem -noout -subject -ext keyUsage,extendedKeyUsage"
     score = 0
     msg = "jamie cert DOES NOT exist"
@@ -122,9 +122,6 @@ def task_A02_04(task: Task) -> Result:
         if "jamie.oliver@dmz.worldskills.org" in cmd_result.result:
             score = 0.05
             msg = "jamie cert exists"
-        if "TLS Web Client Authentication" in cmd_result.result:
-            score += 0.1
-            msg = "jamie cert exists and is entitled to use mTLS."
     except Exception:
         command_output.append(UNKNOWN_MSG)
 
@@ -144,11 +141,34 @@ def task_A02_04(task: Task) -> Result:
         command_run=[command, verify_command],
         command_output=command_output,
         score=score,
-        max_score=0.25,
+        max_score=0.15,
     )
 
 
 def task_A02_05(task: Task) -> Result:
+    """Check if jamie cert is entitled for mTLS"""
+    command = "openssl x509 -in /opt/grading/ca/jamie.pem -noout -subject -ext keyUsage,extendedKeyUsage"
+    score = 0
+    msg = "jamie's cert is NOT entitled to use mTLS"
+    try:
+        cmd_result = task.run(task=paramiko_command, command=command)
+        if "TLS Web Client Authentication" in cmd_result.result:
+            score = 0.1
+            msg = "jamie's cert is entitled to use mTLS."
+    except Exception:
+        pass
+
+    return Result(
+        host=task.host,
+        result=msg,
+        command_run=command,
+        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
+        score=score,
+        max_score=0.1,
+    )
+
+
+def task_A02_06(task: Task) -> Result:
     """webserver cert check"""
     command = "openssl x509 -in /opt/grading/ca/web.pem -noout -subject"
     score = 0
@@ -183,7 +203,7 @@ def task_A02_05(task: Task) -> Result:
     )
 
 
-def task_A02_06(task: Task) -> Result:
+def task_A02_07(task: Task) -> Result:
     """mailserver cert check"""
     command = "openssl x509 -in /opt/grading/ca/mail.pem -noout -subject"
     score = 0
