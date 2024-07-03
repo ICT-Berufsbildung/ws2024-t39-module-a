@@ -27,6 +27,15 @@
         src: ./policies-tb.json
         dest: /usr/lib/thunderbird/distribution/policies.json
 
+    - name: copy CA cert
+      ansible.builtin.copy:
+        src: ./ca.crt
+        dest: /usr/local/share/ca-certificates/
+
+    - name: Update ca certs
+      ansible.builtin.shell: 
+        cmd: update-ca-certificates
+
     - name: Prepare system to import wireguard on next reboot
       copy:
         dest: /etc/systemd/system/import-wg.service

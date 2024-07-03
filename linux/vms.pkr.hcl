@@ -248,4 +248,29 @@ build {
     source = "http/resolv.dmz.conf"
     destination = "/etc/resolv.conf"
   }
+
+  provisioner "shell" {
+    script = "http/grading/prepare-grading.sh"
+  }
+
+  provisioner "file" {
+    source = "http/fw/id_ed25519"
+    destination = "/root/.ssh/id_ed25519"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "chmod 600 /root/.ssh/id_ed25519"
+    ]
+  }
+
+  provisioner "file" {
+    source = "http/grading/wsc_grading.zip"
+    destination = "/usr/local/share/wsc_grading.zip"
+  }
+
+  provisioner "file" {
+    source = "http/grading/grading.sh"
+    destination = "/usr/local/bin/grading"
+  }
 }

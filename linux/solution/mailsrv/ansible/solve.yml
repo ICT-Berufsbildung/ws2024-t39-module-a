@@ -30,7 +30,7 @@
     - name: Copy backup script
       ansible.builtin.copy:
         src: ./backup.sh
-        dest: /root
+        dest: /opt
         force: yes
     - name: Copy postfix cert
       ansible.builtin.copy:

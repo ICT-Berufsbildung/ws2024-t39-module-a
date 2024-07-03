@@ -16,8 +16,8 @@ user_attrs = \
   mailMessageStore=mail
 
 # User filter
-user_filter = (&(objectClass=inetOrgPerson)(uid=%n))
-pass_filter = (&(objectClass=inetOrgPerson)(uid=%n))
+user_filter = (&(objectClass=inetOrgPerson)(|(uid=%n)(mail=%u)))
+pass_filter = (&(objectClass=inetOrgPerson)(|(uid=%n)(mail=%u)))
 
 # Default user settings (if LDAP query fails)
 default_pass_scheme = SHA512-CRYPT
