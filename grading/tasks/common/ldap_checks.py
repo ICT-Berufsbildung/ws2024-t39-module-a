@@ -22,7 +22,7 @@ class LDAP_ATTR(enum.StrEnum):
 def get_ldap_user_base_search(username: str) -> str:
     if username == "admin":
         return f'ldapsearch -H ldap://localhost -b cn={username},{BASE_DN} -x "(objectclass=*)"'
-    return f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=person)(uid={username}))"'
+    return f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=inetOrgPerson)(uid={username}))"'
 
 
 def get_ldap_user_search(username: str) -> str:
@@ -78,12 +78,11 @@ def check_ldap_user_attributes(task: Task, username: str, mail: str) -> SubAspec
         # member of OU Employees
         if "ou=Employees,dc=int,dc=worldskills,dc=org" not in cmd_result.result:
             missing_attr.append(LDAP_ATTR.OU_EXISTS)
-
+        if len(missing_attr) == 0:
+            score += 1
     except Exception:
         pass
 
-    if len(missing_attr) == 0:
-        score = 1
 
     # Prepare message
     msg = f"User {username} DOES NOT exists"
@@ -122,7 +121,7 @@ def check_ldap_login(task: Task, username: str):
 
     if cn:
         # Try to login
-        login_command = f"{base_command} -D {cn} -w {ADMIN_PW}"
+        login_command = f"{base_command} -D \"{cn}\" -w {ADMIN_PW}"
         commands.append(login_command)
         try:
             task.run(task=paramiko_command, command=f"{login_command}")
