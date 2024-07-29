@@ -1,6 +1,6 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
 
+from tasks.common.command_controller import run_command
 from tasks.common.ldap_checks import (
     check_ldap_login,
     check_ldap_user_attributes,
@@ -18,7 +18,7 @@ def task_A01_01(task: Task) -> Result:
     """LDAP check"""
     command = r"""timeout 2 bash -c "echo -e '\x1dclose\x0d' | telnet 127.0.0.1 389" && timeout 2 bash -c "echo -e '\x1dclose\x0d' | telnet ::1 389" """
     try:
-        task.run(task=paramiko_command, command=command)
+        run_command(task=task, command=command)
         # Exit code is 0
         got_mark = True
     except Exception:
@@ -47,8 +47,7 @@ def task_A01_02(task: Task) -> Result:
     cmd_result = None
     try:
         # Redirect stderr to stdout
-        cmd_result = task.run(
-            task=paramiko_command, command=f"({command} || {base_command}) 2>&1"
+        cmd_result = run_command(task=task, command=f"({command} || {base_command}) 2>&1"
         )
         # Check if ou exits
         got_mark = (

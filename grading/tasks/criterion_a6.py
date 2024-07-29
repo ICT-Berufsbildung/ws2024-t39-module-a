@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 
@@ -13,7 +13,7 @@ def task_A06_01(task: Task) -> Result:
     cmd_result = None
     msg = "tcp/80 is NOT reachable over WAN"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "Connected to 1.1.1.10" in cmd_result.result:
             msg = "tcp/80 is reachable over WAN"
             score = 0.1
@@ -37,7 +37,7 @@ def task_A06_02(task: Task) -> Result:
     cmd_result = None
     msg = "tcp/443 is NOT reachable over WAN"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "Connected to 1.1.1.10" in cmd_result.result:
             msg = "tcp/443 is reachable over WAN"
             score = 0.1
@@ -65,13 +65,13 @@ def task_A06_03(task: Task) -> Result:
     command_outputs = []
     msg = "udp/53 and tcp/53 are NOT reachable over WAN"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org" in cmd_result.result:
             msg = "udp/53 is reachable over WAN"
             score += 0.05
 
-        cmd_result = task.run(task=paramiko_command, command=second_command)
+        cmd_result = run_command(task=task, command=second_command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org" in cmd_result.result:
             msg = (
@@ -99,7 +99,7 @@ def task_A06_04a(task: Task) -> Result:
     cmd_result = None
     cheated = False
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "1.1.1.10" in cmd_result.result:
             cheated = True
     except Exception:
@@ -132,7 +132,7 @@ def task_A06_04(
     cmd_result = None
     msg = "SNAT is not working on fw01"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "Connected to 1.1.1.20" in cmd_result.result:
             msg = "SNAT is working on fw01"
             score = 0.1

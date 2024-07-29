@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 
@@ -14,7 +14,7 @@ def task_A08_01(task: Task) -> Result:
     msg = "IPv4 traffic not intercepted by transparent proxy"
     v4_intercepted = False
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if "x-secured-by: clearsky-proxy" in cmd_result.result:
             msg = "Only IPv4 traffic intercepted by transparent proxy"
@@ -24,7 +24,7 @@ def task_A08_01(task: Task) -> Result:
         command_outputs.append(UNKNOWN_MSG)
 
     try:
-        cmd_result = task.run(task=paramiko_command, command=second_command)
+        cmd_result = run_command(task=task, command=second_command)
         command_outputs.append(cmd_result.result)
         if "x-secured-by: clearsky-proxy" in cmd_result.result:
             msg = (

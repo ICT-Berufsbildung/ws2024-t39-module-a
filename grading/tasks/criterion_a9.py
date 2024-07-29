@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 
@@ -12,7 +12,7 @@ def task_A09_01(task: Task) -> Result:
     msg = "No mail server listening on port 143"
     v4_enabled = False
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "0.0.0.0:143" in cmd_result.result:
             msg = "Mail server is reachable over IPv4 on tcp/143"
             score += 0.05
@@ -44,7 +44,7 @@ def task_A09_02(task: Task) -> Result:
     cmd_result = None
     msg = "STARTTLS over IMAP not available on mailserver. "
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "Verification: OK" in cmd_result.result:
             msg = "Certificate is valid."
             score += 0.1
@@ -73,7 +73,7 @@ def task_A09_03(task: Task) -> Result:
     # Cheat check
     msg = "Cannot send mail as jamie."
     try:
-        cmd_result = task.run(task=paramiko_command, command=verify_command)
+        cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(cmd_result.result)
         if "jamie:" in cmd_result.result:
             return Result(
@@ -92,7 +92,7 @@ def task_A09_03(task: Task) -> Result:
     commands.append(command)
     cmd_result = None
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         msg = "LDAP user jamie can send mail over SMTPS"
     except Exception:
@@ -103,7 +103,7 @@ def task_A09_03(task: Task) -> Result:
     command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@localhost/INBOX?SUBJECT%20WSC2024_FLAG 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
     commands.append(command)
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         msg = "LDAP user jamie can send and receive mail."
         score = 1.0
@@ -129,7 +129,7 @@ def task_A09_04(task: Task) -> Result:
     msg = "User jamie cannot send to mail echo service"
 
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         msg = "LDAP User jamie can send mail to echo"
     except Exception:
@@ -140,7 +140,7 @@ def task_A09_04(task: Task) -> Result:
     command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@localhost/INBOX?FROM%20echo@dmz.worldskills.org 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
     commands.append(command)
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         mail_body = cmd_result.result
         mail_body = mail_body.lower()

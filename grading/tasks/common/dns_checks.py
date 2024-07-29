@@ -1,6 +1,6 @@
 from enum import StrEnum
 from nornir.core.task import Task
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 from tasks.common.sub_aspect_model import SubAspectResult
@@ -20,7 +20,7 @@ def check_dns_port_listen(task: Task) -> SubAspectResult:
     score = 0
     msg = f"{task.host.name} is not listening on tcp/53 for IPv4 AND IPv6"
     try:
-        task.run(task=paramiko_command, command=command)
+        run_command(task=task, command=command)
         msg = f"{task.host.name} is listening on tcp/53 for IPv4 AND IPv6"
         score = 1
     except Exception:
@@ -44,7 +44,7 @@ def check_dns_record(
     cmd_result = None
     msg = f"{query} IN {record_type.value} is NOT {expected}"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if expected in cmd_result.result:
             msg = f"{query} IN {record_type.value} {expected}"
             score = 1

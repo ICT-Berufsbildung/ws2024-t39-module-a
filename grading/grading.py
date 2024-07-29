@@ -62,6 +62,14 @@ parser.add_argument(
     default=False,
     help="Enable verbose mode: prints the executed command and the command output as well.",
 )
+parser.add_argument(
+    "-l",
+    "--local",
+    action=argparse.BooleanOptionalAction,
+    dest="run_local",
+    default=False,
+    help="Run the task locally instead over SSH. Must be executed on the target machine!",
+)
 
 args = parser.parse_args()
 
@@ -75,11 +83,12 @@ nr = (
             },
         },
         user_defined={
-            "run_tags": [f"task_{tag.upper()}" for tag in args.run_tags]
+            "run_tags": [f"task_{tag.upper()}" for tag in args.run_tags],
+            "run_local": args.run_local
         },  # Store the task tags to run
     )
     .with_processors(
-        [PrintScoreReport(args.verbose)]
+        [PrintScoreReport(args.verbose, args.run_local)]
     )  # Custom output handler. Prints the score report
     .with_runner(
         ThreadedTagRunner()

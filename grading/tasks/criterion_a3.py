@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import process_result_exit_code
 
@@ -10,7 +10,7 @@ def task_A03_01(task: Task) -> Result:
     score = 0
     msg = "Jamie user cannot login"
     try:
-        task.run(task=paramiko_command, command=command)
+        run_command(task=task, command=command)
         msg = "jamie can login on Samba share."
         score = 0.5
     except Exception:
@@ -33,7 +33,7 @@ def task_A03_02(task: Task) -> Result:
     msg = "Cannot access public share."
     try:
         # Read
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         # Check if there is not login failure
         if (
             ".." in cmd_result.result
@@ -60,7 +60,7 @@ def task_A03_03(task: Task) -> Result:
     msg = "Cannot access public share with user."
     write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/public -I 127.0.0.1 -U "jamie%Skill39" -c "put /tmp/lorem.txt lorem.txt"'
     try:
-        cmd_result = task.run(task=paramiko_command, command=write_command)
+        cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
         if (
             "NT_STATUS_ACCESS_DENIED" not in cmd_result.result
@@ -87,7 +87,7 @@ def task_A03_04(task: Task) -> Result:
     msg = "Cannot access public share."
     write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/public -I 127.0.0.1 -U "%" -c "put /tmp/lorem.txt lorem.txt" 2>&1 || true'
     try:
-        cmd_result = task.run(task=paramiko_command, command=write_command)
+        cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
         if "NT_STATUS_ACCESS_DENIED" in cmd_result.result:
             score = 0.25
@@ -113,7 +113,7 @@ def task_A03_05(task: Task) -> Result:
         'smbclient //localhost/internal -I 127.0.0.1 -U "%" -c "ls" 2>&1 || true'
     )
     try:
-        cmd_result = task.run(task=paramiko_command, command=write_command)
+        cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
         if "NT_STATUS_ACCESS_DENIED" in cmd_result.result:
             score = 0.25
@@ -137,7 +137,7 @@ def task_A03_06(task: Task) -> Result:
     msg = "Cannot write on internal share with user"
     write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/internal -I 127.0.0.1 -U "jamie%Skill39" -c "put /tmp/lorem.txt lorem.txt" || true'
     try:
-        cmd_result = task.run(task=paramiko_command, command=write_command)
+        cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
         if (
             "NT_STATUS_ACCESS_DENIED" not in cmd_result.result

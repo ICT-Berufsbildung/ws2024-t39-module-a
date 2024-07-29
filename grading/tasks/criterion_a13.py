@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 
@@ -11,7 +11,7 @@ def task_A13_01(task: Task) -> Result:
     cmd_result = None
     msg = f"Reverse proxy {task.host} is not listening on port 80"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if (
             "Connected to 127.0.0.1" in cmd_result.result
             and "Connected to ::1" in cmd_result.result
@@ -38,7 +38,7 @@ def task_A13_02(task: Task) -> Result:
     cmd_result = None
     msg = f"Reverse proxy {task.host} is not listening on port 443"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if (
             "Connected to 127.0.0.1" in cmd_result.result
             and "Connected to ::1" in cmd_result.result
@@ -69,7 +69,7 @@ def task_A13_03(task: Task) -> Result:
     try:
         for round in range(4):
             commands.append(command)
-            cmd_result = task.run(task=paramiko_command, command=command)
+            cmd_result = run_command(task=task, command=command)
             web_response = cmd_result.result
             command_outputs.append(web_response)
             if "web01" in web_response and "web02" not in web_response:
@@ -101,7 +101,7 @@ def task_A13_04(task: Task) -> Result:
     cmd_result = None
     msg = "Reverse proxy is NOT setting via-proxy header"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "via-proxy: ha-prx" in cmd_result.result:
             msg = "Reverse proxy has set via-proxy header"
             score = 0.5
@@ -125,7 +125,7 @@ def task_A13_05(task: Task) -> Result:
     cmd_result = None
     msg = "Reverse proxy is NOT redirecting HTTP to HTTPS"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if (
             "HTTP/1.1 301" in cmd_result.result or "HTTP/1.1 302" in cmd_result.result
         ) and "location: https://" in cmd_result.result.lower():
@@ -150,7 +150,7 @@ def task_A13_06a(task: Task) -> Result:
     cmd_result = None
     fingerprint = ""
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         fingerprint = cmd_result.result.replace("SHA1 Fingerprint=", "")
     except Exception:
         # Exit code 1
@@ -175,7 +175,7 @@ def task_A13_06(
     cmd_result = None
     msg = "TLS certificate is not signed by CA"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if certificate_fingerprint in cmd_result.result:
             msg = "TLS certificate is signed by CA"
             score = 0.3
@@ -203,7 +203,7 @@ def task_A13_07(task: Task) -> Result:
     cmd_result = None
     msg = "Virtual IP is NOT reachable over IPv4 & IPv6"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if (
             "10.1.20.20" in cmd_result.result
             and "2001:db8:1001:20::20" in cmd_result.result

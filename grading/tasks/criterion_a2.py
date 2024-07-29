@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 
@@ -12,7 +12,7 @@ def task_A02_01(task: Task) -> Result:
     score = 0
     cmd_result = None
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         # Exit code is 0
         score += 0.1
         msg = "Root CA exists"
@@ -40,7 +40,7 @@ def task_A02_02(task: Task) -> Result:
     score = 0
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         msg = "Users Sub CA exists"
         if "CA:TRUE" in cmd_result.result and "Certificate Sign" in cmd_result.result:
@@ -54,7 +54,7 @@ def task_A02_02(task: Task) -> Result:
         "openssl verify -CAfile /opt/grading/ca/ca.pem /opt/grading/ca/users.pem"
     )
     try:
-        verify_cmd_result = task.run(task=paramiko_command, command=verify_command)
+        verify_cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(verify_cmd_result.result)
         if "/opt/grading/ca/users.pem: OK" in verify_cmd_result.result:
             score += 0.1
@@ -78,7 +78,7 @@ def task_A02_03(task: Task) -> Result:
     score = 0
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         msg = "Services Sub CA exists"
         if "CA:TRUE" in cmd_result.result and "Certificate Sign" in cmd_result.result:
@@ -92,7 +92,7 @@ def task_A02_03(task: Task) -> Result:
         "openssl verify -CAfile /opt/grading/ca/ca.pem /opt/grading/ca/services.pem"
     )
     try:
-        verify_cmd_result = task.run(task=paramiko_command, command=verify_command)
+        verify_cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(verify_cmd_result.result)
         if "/opt/grading/ca/services.pem: OK" in verify_cmd_result.result:
             score += 0.1
@@ -117,7 +117,7 @@ def task_A02_04(task: Task) -> Result:
     msg = "jamie cert DOES NOT exist"
     command_output = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_output.append(cmd_result.result)
         if "jamie.oliver@dmz.worldskills.org" in cmd_result.result:
             score = 0.05
@@ -127,7 +127,7 @@ def task_A02_04(task: Task) -> Result:
 
     verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/users.pem /opt/grading/ca/ca.pem) /opt/grading/ca/jamie.pem"
     try:
-        verify_cmd_result = task.run(task=paramiko_command, command=verify_command)
+        verify_cmd_result = run_command(task=task, command=verify_command)
         command_output.append(verify_cmd_result.result)
         if "/opt/grading/ca/jamie.pem: OK" in verify_cmd_result.result:
             score += 0.1
@@ -151,7 +151,7 @@ def task_A02_05(task: Task) -> Result:
     score = 0
     msg = "jamie's cert is NOT entitled to use mTLS"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "TLS Web Client Authentication" in cmd_result.result:
             score = 0.1
             msg = "jamie's cert is entitled to use mTLS."
@@ -175,7 +175,7 @@ def task_A02_06(task: Task) -> Result:
     msg = "webserver cert DOES NOT exist"
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if "www.dmz.worldskills.org" in cmd_result.result:
             score = 0.05
@@ -185,7 +185,7 @@ def task_A02_06(task: Task) -> Result:
 
     verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/services.pem /opt/grading/ca/ca.pem) /opt/grading/ca/web.pem"
     try:
-        verify_cmd_result = task.run(task=paramiko_command, command=verify_command)
+        verify_cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(verify_cmd_result.result)
         if "/opt/grading/ca/web.pem: OK" in verify_cmd_result.result:
             score += 0.05
@@ -210,7 +210,7 @@ def task_A02_07(task: Task) -> Result:
     msg = "mailserver cert DOES NOT exist"
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if "mail.dmz.worldskills.org" in cmd_result.result:
             score = 0.05
@@ -220,7 +220,7 @@ def task_A02_07(task: Task) -> Result:
 
     verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/services.pem /opt/grading/ca/ca.pem) /opt/grading/ca/mail.pem"
     try:
-        verify_cmd_result = task.run(task=paramiko_command, command=verify_command)
+        verify_cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(verify_cmd_result.result)
         if "/opt/grading/ca/mail.pem: OK" in verify_cmd_result.result:
             score += 0.05

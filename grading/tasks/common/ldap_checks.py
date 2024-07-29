@@ -1,7 +1,7 @@
 import enum
 import re
 from nornir.core.task import Task
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 from tasks.common.sub_aspect_model import SubAspectResult
@@ -39,7 +39,7 @@ def check_ldap_user_exists(task: Task, username: str) -> SubAspectResult:
     cmd_result = None
     msg = f"User {username} DOES NOT exists"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if username != "admin" and f"uid: {username}" in cmd_result.result:
             msg = f"User {username} exists"
             score = 1
@@ -66,7 +66,7 @@ def check_ldap_user_attributes(task: Task, username: str, mail: str) -> SubAspec
     cmd_result = None
     try:
         # Redirect stderr to stdout
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         # Check if ou exits
         if f"uid: {username}" not in cmd_result.result:
             missing_attr.append(LDAP_ATTR.UID_EXISTS)
@@ -78,12 +78,12 @@ def check_ldap_user_attributes(task: Task, username: str, mail: str) -> SubAspec
         # member of OU Employees
         if "ou=Employees,dc=int,dc=worldskills,dc=org" not in cmd_result.result:
             missing_attr.append(LDAP_ATTR.OU_EXISTS)
-
+        
+        if len(missing_attr) == 0:
+            score = 1
     except Exception:
         pass
 
-    if len(missing_attr) == 0:
-        score = 1
 
     # Prepare message
     msg = f"User {username} DOES NOT exists"
@@ -110,7 +110,7 @@ def check_ldap_login(task: Task, username: str):
     command_outputs = []
     try:
         # Redirect stderr to stdout
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
 
         # Get configured DN for the user
@@ -125,7 +125,7 @@ def check_ldap_login(task: Task, username: str):
         login_command = f"{base_command} -D {cn} -w {ADMIN_PW}"
         commands.append(login_command)
         try:
-            task.run(task=paramiko_command, command=f"{login_command}")
+            run_command(task=task, command=f"{login_command}")
             score = 1
             command_outputs.append(process_result_exit_code(True))
         except Exception:

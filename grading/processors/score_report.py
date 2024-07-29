@@ -16,8 +16,9 @@ class PrintScoreReport:
     Prints score report.
     """
 
-    def __init__(self, verbose: bool = False) -> None:
+    def __init__(self, verbose: bool = False, run_local = False) -> None:
         self.verbose = verbose
+        self.run_local = run_local
         self.even = False
         self.lock = threading.Lock()
         banner = """
@@ -80,9 +81,14 @@ ___] |___ |__| |  \ |___    |  \ |___ |    |__| |  \  |
                     for i, c in enumerate(executed_commands):
                         # Print command
                         try:
-                            print(
-                                f"{Style.BRIGHT}{command_color}Executed command on {host} =>\n$ {executed_commands[i]}"
-                            )
+                            if self.run_local is False:
+                                print(
+                                    f"{Style.BRIGHT}{command_color}Executed command on {host} =>\n$ {executed_commands[i]}"
+                                )
+                            else:
+                                print(
+                                    f"{Style.BRIGHT}{command_color}Executed command {Fore.YELLOW}locally{command_color} =>\n$ {executed_commands[i]}"
+                                )
                         except IndexError:
                             print(
                                 f"{Style.BRIGHT}{command_color}Unknown command on {host}!"
@@ -98,9 +104,14 @@ ___] |___ |__| |  \ |___    |  \ |___ |    |__| |  \  |
                             )
                             continue
                 else:
-                    print(
-                        f"{Style.BRIGHT}{command_color}Executed command on {host} =>\n$ {executed_commands}"
-                    )
+                    if self.run_local is False:
+                        print(
+                            f"{Style.BRIGHT}{command_color}Executed command on {host} =>\n$ {executed_commands}"
+                        )
+                    else:
+                        print(
+                            f"{Style.BRIGHT}{command_color}Executed command {Fore.YELLOW}locally{command_color} =>\n$ {executed_commands}"
+                        )
                     print(f"{Style.BRIGHT}{command_output_color}> {command_results}")
             placeholder = "=" if self.even else "-"
             self.even = not self.even

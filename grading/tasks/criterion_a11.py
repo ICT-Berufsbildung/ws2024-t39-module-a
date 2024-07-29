@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 
@@ -11,7 +11,7 @@ def task_A11_01(task: Task) -> Result:
     cmd_result = None
     msg = "TrustedUserCAKeys is NOT set on sshd"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "trustedusercakeys" in cmd_result.result:
             msg = "TrustedUserCAKeys is set on sshd"
             score = 0.2
@@ -35,7 +35,7 @@ def task_A11_02(task: Task) -> Result:
     cmd_result = None
     msg = "SSH certificate based auth failed"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "CERT" in cmd_result.result:
             msg = "SSH certificate based auth was successful"
             score = 1.5

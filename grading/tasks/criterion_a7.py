@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 
@@ -11,7 +11,7 @@ def task_A07_01(task: Task) -> Result:
     cmd_result = None
     msg = "wg0 interface is not up"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "interface: wg0" in cmd_result.result:
             msg = "wg0 interface is up"
             score = 0.1
@@ -34,7 +34,7 @@ def task_A07_02(task: Task) -> Result:
     score = 0
     msg = "PSK is not configured for wg0"
     try:
-        task.run(task=paramiko_command, command=command)
+        run_command(task=task, command=command)
         msg = "PSK is configured for wg0"
         score = 0.2
     except Exception:
@@ -58,7 +58,7 @@ def task_A07_03(task: Task) -> Result:
     command_outputs = []
     vpn_interface_name = ""
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         vpn_interface_name = cmd_result.result.strip()
         command_outputs.append(cmd_result.result)
     except Exception:
@@ -70,7 +70,7 @@ def task_A07_03(task: Task) -> Result:
         command = f"(ip route get 10.1.10.10 ; ip -6 route get 2001:db8:1001:10::10) | grep {vpn_interface_name} | wc -l"
         commands.append(command)
         try:
-            cmd_result = task.run(task=paramiko_command, command=command)
+            cmd_result = run_command(task=task, command=command)
             command_outputs.append(cmd_result.result)
             # Route through wireguard per route has been found (IPv4 & IPv6)
             if "2" in cmd_result.result:
@@ -96,7 +96,7 @@ def task_A07_04(task: Task) -> Result:
     cmd_result = None
     msg = "systemd service for wireguard not available nor active"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "active" in cmd_result.result:
             msg = "systemd service for wireguard is active"
             score = 0.1
@@ -123,7 +123,7 @@ def task_A07_05(task: Task) -> Result:
     msg = "jamie-ws01 is not able to reach DNS over IPv4 & IPv6"
     v4_reachable = False
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if "worldskills.org" in cmd_result.result:
             msg = "jamie-ws01 is able to reach DNS over IPv4 only"
@@ -137,7 +137,7 @@ def task_A07_05(task: Task) -> Result:
     )
     commands.append(command)
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if "worldskills.org" in cmd_result.result:
             msg = (

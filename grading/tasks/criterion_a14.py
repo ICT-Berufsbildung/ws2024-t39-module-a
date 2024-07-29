@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 
@@ -11,7 +11,7 @@ def task_A14_01(task: Task) -> Result:
     cmd_result = None
     msg = f"main.html is NOT served as index page on {task.host}"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "7ecb4e033421b96f88e2111fe97cdad4ddceacc6" in cmd_result.result:
             msg = f"main.html is served as index page on {task.host}"
             score = 0.2
@@ -35,7 +35,7 @@ def task_A14_02(task: Task) -> Result:
     cmd_result = None
     msg = f"404.html is NOT served as 404 page on {task.host}"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "Sorry, but something went wrong" in cmd_result.result:
             msg = f"404.html is served as 404 page on {task.host}"
             score = 0.2

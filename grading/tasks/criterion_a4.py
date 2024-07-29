@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 from tasks.common.dns_checks import (
@@ -70,7 +70,7 @@ def task_A04_04(task: Task) -> Result:
     msg = "SRV record for int-srv01.int.worldskills.org does not exist"
     cmd_result = None
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "10 50 389 int-srv01.int.worldskills.org" in cmd_result.result:
             msg = "SRV record for int-srv01.int.worldskills.org exists"
             score = 0.2
@@ -94,7 +94,7 @@ def task_A04_05(task: Task) -> Result:
     cmd_result = None
     msg = "int-srv01 is not a recursive"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "recursion requested but not available" not in cmd_result.result:
             msg = "int-srv01 is a recursive name server"
             score = 0.2
@@ -120,7 +120,7 @@ def task_A04_06(task: Task) -> Result:
     commands = [command, dig_command]
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if (
             "type: secondary" in cmd_result.result
@@ -129,7 +129,7 @@ def task_A04_06(task: Task) -> Result:
             msg = "int-srv01 is secondary for dmz.worldskills.org."
             score += 0.05
 
-        cmd_result = task.run(task=paramiko_command, command=dig_command)
+        cmd_result = run_command(task=task, command=dig_command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org." in cmd_result.result:
             score += 0.05
@@ -157,7 +157,7 @@ def task_A04_07(task: Task) -> Result:
     commands = [command, dig_command]
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if (
             "type: secondary" in cmd_result.result
@@ -166,7 +166,7 @@ def task_A04_07(task: Task) -> Result:
             msg = "int-srv01 is secondary for 20.1.10.in-addr.arpa."
             score += 0.05
 
-        cmd_result = task.run(task=paramiko_command, command=dig_command)
+        cmd_result = run_command(task=task, command=dig_command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org." in cmd_result.result:
             score += 0.05
@@ -194,7 +194,7 @@ def task_A04_08(task: Task) -> Result:
     commands = [command, dig_command]
     command_outputs = []
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         command_outputs.append(cmd_result.result)
         if (
             "type: secondary" in cmd_result.result
@@ -203,7 +203,7 @@ def task_A04_08(task: Task) -> Result:
             msg = "int-srv01 is secondary for IPv6 reverse zone in DMZ."
             score += 0.05
 
-        cmd_result = task.run(task=paramiko_command, command=dig_command)
+        cmd_result = run_command(task=task, command=dig_command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org." in cmd_result.result:
             score += 0.05

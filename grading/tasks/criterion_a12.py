@@ -1,5 +1,5 @@
 from nornir.core.task import Task, Result
-from nornir_paramiko.plugins.tasks import paramiko_command
+from tasks.common.command_controller import run_command
 
 from tasks.common.helper import UNKNOWN_MSG
 from tasks.common.dns_checks import (
@@ -33,7 +33,7 @@ def task_A12_02(task: Task) -> Result:
     if task.host.name == "ha-prx01":
         msg = f"{task.host.name} is NOT primary name server for dmz.worldskills.org"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if task.host.name == "ha-prx01" and "type: primary" in cmd_result.result:
             msg = f"{task.host.name} is primary name server for dmz.worldskills.org"
             score += 0.2
@@ -60,7 +60,7 @@ def task_A12_03(task: Task) -> Result:
     cmd_result = None
     msg = f"{task.host} is a recursive name server!"
     try:
-        cmd_result = task.run(task=paramiko_command, command=command)
+        cmd_result = run_command(task=task, command=command)
         if "recursion requested but not available" in cmd_result.result:
             msg = f"{task.host} is a not a recursive name server"
             score = 0.2
