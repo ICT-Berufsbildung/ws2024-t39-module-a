@@ -112,7 +112,7 @@
         sn: "Fox"
         givenName: "Peter"
         mail: "peter.fox@dmz.worldskills.org"
-        uid: "peter.fox"
+        uid: "peter"
         uidNumber: 1113
         gidNumber: 1113
         userPassword: "{{ hashed_password.stdout }}"
@@ -133,8 +133,6 @@
       state: restarted
       name: named
       enabled: true
-
-
 
   - name: copy samba configuration
     ansible.builtin.copy:
