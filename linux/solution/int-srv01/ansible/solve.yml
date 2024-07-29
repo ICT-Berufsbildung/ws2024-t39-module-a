@@ -134,8 +134,6 @@
       name: named
       enabled: true
 
-
-
   - name: copy samba configuration
     ansible.builtin.copy:
       src: ./smb.conf

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/share/grading/venv/bin/python
 import argparse
 import signal
 import sys

@@ -12,7 +12,7 @@ def task_A11_01(task: Task) -> Result:
     msg = "TrustedUserCAKeys is NOT set on sshd"
     try:
         cmd_result = run_command(task=task, command=command)
-        if "trustedusercakeys" in cmd_result.result:
+        if "trustedusercakeys" in cmd_result.result and "trustedusercakeys none" not in cmd_result.result:
             msg = "TrustedUserCAKeys is set on sshd"
             score = 0.2
     except Exception:

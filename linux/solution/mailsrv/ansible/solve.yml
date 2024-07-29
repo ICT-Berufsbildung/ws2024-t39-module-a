@@ -49,7 +49,7 @@
         force: yes
     - name: Add CA to sshd_conf
       ansible.builtin.lineinfile:
-        path: /etc/sshd
+        path: /etc/ssh/sshd_config
         line: TrustedUserCAKeys /etc/ssh/ca.key.pub
         create: yes
 

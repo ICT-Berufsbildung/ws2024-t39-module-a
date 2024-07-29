@@ -8,7 +8,6 @@ packer {
 }
 
 source "vsphere-iso" "base" {
-
   CPUs         = 2
   RAM          = 1024
   boot_command = [
@@ -40,10 +39,10 @@ source "vsphere-iso" "base" {
   http_port_min  = 5100
   http_port_max  = 5150
   tools_sync_time = true
-  export {
-    force = true
-    output_directory = "./solution-artifacts"
-  }
+#  export {
+#    force = true
+#    output_directory = "./solution-artifacts"
+#  }
 }
 # ha-prx01
 build {
@@ -58,6 +57,13 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname ha-prx01"]
+  }
+  provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/ha-prx/interfaces01"
@@ -91,6 +97,13 @@ build {
     inline = ["hostnamectl set-hostname ha-prx02"]
   }
   provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
+  }
+  provisioner "file" {
     source = "http/ha-prx/interfaces02"
     destination = "/etc/network/interfaces"
   }
@@ -119,6 +132,13 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname web01"]
+  }
+  provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/web/interfaces01"
@@ -153,6 +173,13 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname web02"]
+  }
+  provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/web/interfaces02"
@@ -194,6 +221,13 @@ build {
     inline = ["hostnamectl set-hostname mail"]
   }
   provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
+  }
+  provisioner "file" {
     source = "solution/mailsrv/"
     destination = "/opt"
   }
@@ -225,6 +259,13 @@ build {
     inline = ["hostnamectl set-hostname int-srv01"]
   }
   provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
+  }
+  provisioner "file" {
     source = "http/int-srv01/interfaces"
     destination = "/etc/network/interfaces"
   }
@@ -253,6 +294,13 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname jamie-ws01"]
+  }
+  provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/jamie-ws01/interfaces"
@@ -291,6 +339,13 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname fw01"]
+  }
+  provisioner "file" {
+    source = "grading/artifacts"
+    destination = "/tmp"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/firewall/interfaces"
