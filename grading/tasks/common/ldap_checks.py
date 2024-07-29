@@ -22,7 +22,7 @@ class LDAP_ATTR(enum.StrEnum):
 def get_ldap_user_base_search(username: str) -> str:
     if username == "admin":
         return f'ldapsearch -H ldap://localhost -b cn={username},{BASE_DN} -x "(objectclass=*)"'
-    return f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=inetOrgPerson)(uid={username}))"'
+    return f'ldapsearch -H ldap://localhost -b {BASE_DN} -x "(&(objectclass=person)(uid={username}))"'
 
 
 def get_ldap_user_search(username: str) -> str:
