@@ -71,67 +71,29 @@
         owner: vmail
         group: vmail
 
-    - name: Create directory /etc/keys/
-      ansible.builtin.file:
-        path: /etc/keys
-        state: directory
-        mode: '0700'
-        owner: root
-        group: root
-
-    - name: Generate luks keyfile
-      community.crypto.openssl_privatekey:
-        path: /etc/keys/backup.key
-        owner: root
-        group: root
-
-    - name: Create luks container and add keys
-      community.crypto.luks_device:
-        device: "/dev/sdb"
-        state: opened
-        passphrase: "Skill39"
-        new_keyfile: /etc/keys/backup.key
-        name: "backup"
-
-    - name: Get UUID of disk
-      ansible.builtin.command: lsblk /dev/sdb -no UUID -I 8 -d
-      register: disk_UUID
-
-    - name: Fail if UUID is not an UUID
-      ansible.builtin.fail:
-        msg: Could not evaluate the disk UUID!
-      when: disk_UUID.stdout is not regex('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
-
-    - name: Show disk UUID
-      debug:
-        msg: "The UUID of /dev/sdb is {{ disk_UUID.stdout }}"
-
-    - name: Add Container to crypttab
-      community.general.crypttab:
-        backing_device: "UUID={{ disk_UUID.stdout }}"
-        name: "backup"
+    - name: Create a partition on /dev/sdb
+      parted:
+        device: /dev/sdb
+        number: 1
         state: present
-        password: /etc/keys/backup.key
-        opts: discard
+        part_type: primary
+        fs_type: ext4
+        resize: yes
 
     - name: Create filesystem
       community.general.filesystem:
         fstype: ext4
-        dev: /dev/mapper/backup
+        dev: /dev/sdb1
         state: present
 
     - name: Get UUID of filesystem
-      ansible.builtin.command: lsblk /dev/mapper/backup -no UUID -I 8 -d
+      ansible.builtin.command: lsblk /dev/sdb1 -no UUID -I 8 -d
       register: fs_UUID
 
     - name: Fail if UUID is not an UUID
       ansible.builtin.fail:
         msg: Could not evaluate the fs UUID!
       when: fs_UUID.stdout is not regex('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
-
-    - name: Show fs UUID
-      debug:
-        msg: "The UUID of /dev/mapper/backup is {{ fs_UUID.stdout }}"
 
     - name: Mount filesystem
       ansible.posix.mount:
