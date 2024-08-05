@@ -6,7 +6,7 @@ from tasks.common.helper import process_result_exit_code
 
 def task_A03_01(task: Task) -> Result:
     """Samba user check"""
-    command = "smbclient -L //localhost/ -I 127.0.0.1 -U jamie%Skill39"
+    command = "smbclient -L //localhost/ -I 127.0.0.1 -U jamie%Skill39@Lyon"
     score = 0
     msg = "Jamie user cannot login"
     try:
@@ -58,7 +58,7 @@ def task_A03_03(task: Task) -> Result:
     """Write on public share with user"""
     score = 0
     msg = "Cannot access public share with user."
-    write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/public -I 127.0.0.1 -U "jamie%Skill39" -c "put /tmp/lorem.txt lorem.txt"'
+    write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/public -I 127.0.0.1 -U "jamie%Skill39@Lyon" -c "put /tmp/lorem.txt lorem.txt"'
     try:
         cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
@@ -135,7 +135,7 @@ def task_A03_06(task: Task) -> Result:
     """Write on internal share with user"""
     score = 0
     msg = "Cannot write on internal share with user"
-    write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/internal -I 127.0.0.1 -U "jamie%Skill39" -c "put /tmp/lorem.txt lorem.txt" || true'
+    write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/internal -I 127.0.0.1 -U "jamie%Skill39@Lyon" -c "put /tmp/lorem.txt lorem.txt" || true'
     try:
         cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure

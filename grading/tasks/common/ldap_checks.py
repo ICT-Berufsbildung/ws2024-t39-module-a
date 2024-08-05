@@ -8,7 +8,7 @@ from tasks.common.sub_aspect_model import SubAspectResult
 
 BASE_DN = "dc=int,dc=worldskills,dc=org"
 ADMIN_DN = "cn=admin,dc=int,dc=worldskills,dc=org"
-ADMIN_PW = "Skill39"
+ADMIN_PW = "Skill39@Lyon"
 
 
 class LDAP_ATTR(enum.StrEnum):

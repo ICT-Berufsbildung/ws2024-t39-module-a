@@ -27,7 +27,7 @@ source "vsphere-iso" "base" {
     "[lab-storage] ISO/debian-12.5.0-amd64-BD-5.iso"
   ]
   password             = "Skill$39!"
-  ssh_password         = "Skill39"
+  ssh_password         = "Skill39@Lyon"
   ssh_username         = "root"
   storage {
     disk_size             = 32768

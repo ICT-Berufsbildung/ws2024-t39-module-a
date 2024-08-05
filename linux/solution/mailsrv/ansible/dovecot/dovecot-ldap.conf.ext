@@ -2,7 +2,7 @@
 hosts = 10.1.10.10
 # DN to connect to LDAP server
 dn = cn=admin,dc=int,dc=worldskills,dc=org
-dnpass = Skill39
+dnpass = Skill39@Lyon
 
 # Base DN for user searches
 base = ou=Employees,dc=int,dc=worldskills,dc=org

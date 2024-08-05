@@ -11,7 +11,7 @@ from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 
 BASE_DN = "dc=int,dc=worldskills,dc=org"
 ADMIN_DN = "cn=admin,dc=int,dc=worldskills,dc=org"
-ADMIN_PW = "Skill39"
+ADMIN_PW = "Skill39@Lyon"
 
 
 def task_A01_01(task: Task) -> Result:

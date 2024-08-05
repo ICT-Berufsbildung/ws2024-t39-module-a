@@ -88,7 +88,7 @@ def task_A09_03(task: Task) -> Result:
         command_outputs.append(process_result_exit_code(True))
 
     # Send mail over SMTP
-    command = "printf 'Subject: WSC2024_FLAG\n\nWSC2024_FLAG'  | curl -s -k --ssl-reqd  --url smtps://localhost --user jamie:Skill39 -H 'Subject: WSC2024_FLAG' --mail-from 'jamie.oliver@dmz.worldskills.org(Jamie Oliver)' --mail-rcpt jamie.oliver@dmz.worldskills.org --upload-file -"
+    command = "printf 'Subject: WSC2024_FLAG\n\nWSC2024_FLAG'  | curl -s -k --ssl-reqd  --url smtps://localhost --user jamie:Skill39@Lyon -H 'Subject: WSC2024_FLAG' --mail-from 'jamie.oliver@dmz.worldskills.org(Jamie Oliver)' --mail-rcpt jamie.oliver@dmz.worldskills.org --upload-file -"
     commands.append(command)
     cmd_result = None
     try:
@@ -100,7 +100,7 @@ def task_A09_03(task: Task) -> Result:
 
     # Search for Subject WSC2024_FLAG on IMAP server
     cmd_result = None
-    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@localhost/INBOX?SUBJECT%20WSC2024_FLAG 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
+    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@Lyon@localhost/INBOX?SUBJECT%20WSC2024_FLAG 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@Lyon@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
     commands.append(command)
     try:
         cmd_result = run_command(task=task, command=command)
@@ -123,7 +123,7 @@ def task_A09_03(task: Task) -> Result:
 def task_A09_04(task: Task) -> Result:
     """test echo service"""
     score = 0
-    command = "printf 'Subject: WSC2024_ECHO_FLAG\nFrom: jamie.oliver@dmz.worldskills.org\nTo: echo@dmz.worldskills.org\n\nWSC2024_ECHO_FLAG' | curl -s -k --ssl-reqd  --url smtps://localhost --user jamie:Skill39 --mail-from 'jamie.oliver@dmz.worldskills.org(Jamie Oliver)' --mail-rcpt echo@dmz.worldskills.org --upload-file -"
+    command = "printf 'Subject: WSC2024_ECHO_FLAG\nFrom: jamie.oliver@dmz.worldskills.org\nTo: echo@dmz.worldskills.org\n\nWSC2024_ECHO_FLAG' | curl -s -k --ssl-reqd  --url smtps://localhost --user jamie:Skill39@Lyon --mail-from 'jamie.oliver@dmz.worldskills.org(Jamie Oliver)' --mail-rcpt echo@dmz.worldskills.org --upload-file -"
     commands = [command]
     command_outputs = []
     msg = "User jamie cannot send to mail echo service"
@@ -137,7 +137,7 @@ def task_A09_04(task: Task) -> Result:
 
     # Search for Subject WSC2024_ECHO_FLAG on IMAP server
     cmd_result = None
-    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@localhost/INBOX?FROM%20echo@dmz.worldskills.org 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
+    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@Lyon@localhost/INBOX?FROM%20echo@dmz.worldskills.org 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@Lyon@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
     commands.append(command)
     try:
         cmd_result = run_command(task=task, command=command)

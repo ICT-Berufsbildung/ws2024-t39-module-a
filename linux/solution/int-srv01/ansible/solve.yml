@@ -18,10 +18,10 @@
       enabled: yes
   - name: Configure LDAP
     shell: |
-      debconf-set-selections <<< "slapd slapd/internal/adminpw password Skill39"
-      debconf-set-selections <<< "slapd slapd/internal/generated_adminpw password Skill39"
-      debconf-set-selections <<< "slapd slapd/password2 password Skill39"
-      debconf-set-selections <<< "slapd slapd/password1 password Skill39"
+      debconf-set-selections <<< "slapd slapd/internal/adminpw password Skill39@Lyon"
+      debconf-set-selections <<< "slapd slapd/internal/generated_adminpw password Skill39@Lyon"
+      debconf-set-selections <<< "slapd slapd/password2 password Skill39@Lyon"
+      debconf-set-selections <<< "slapd slapd/password1 password Skill39@Lyon"
       debconf-set-selections <<< "slapd slapd/domain string int.worldskills.org"
       DEBIAN_FRONTEND=noninteractive dpkg-reconfigure slapd
     args:
@@ -37,12 +37,12 @@
         sn: "Admin"
         cn: "Admin"
       bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
-      bind_pw: "Skill39"
+      bind_pw: "Skill39@Lyon"
       server_uri: "ldap://localhost"
     no_log: false  # Don't log sensitive information
 
   - name: Generate hashed password for Jamie Oliver
-    command: "slappasswd -s Skill39"
+    command: "slappasswd -s Skill39@Lyon"
     register: hashed_password
     changed_when: false
     no_log: true
@@ -54,7 +54,7 @@
       attributes:
         ou: Employees
       bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
-      bind_pw: "Skill39"
+      bind_pw: "Skill39@Lyon"
       server_uri: "ldap://localhost"
       state: present
 
@@ -76,7 +76,7 @@
         userPassword: "{{ hashed_password.stdout }}"
         homeDirectory: /home/jamie
       bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
-      bind_pw: "Skill39"
+      bind_pw: "Skill39@Lyon"
       server_uri: "ldap://localhost"
       state: present
 
@@ -97,7 +97,7 @@
         userPassword: "{{ hashed_password.stdout }}"
         homeDirectory: /dev/null/nohome
       bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
-      bind_pw: "Skill39"
+      bind_pw: "Skill39@Lyon"
       server_uri: "ldap://localhost"
       state: present
   - name: Create user Peter Fox
@@ -118,7 +118,7 @@
         userPassword: "{{ hashed_password.stdout }}"
         homeDirectory: /dev/null/nohome
       bind_dn: "cn=admin,dc=int,dc=worldskills,dc=org"
-      bind_pw: "Skill39"
+      bind_pw: "Skill39@Lyon"
       server_uri: "ldap://localhost"
       state: present
 
@@ -162,7 +162,7 @@
 
   - name: Create Samba user
     ansible.builtin.shell:
-      cmd: "printf '%s\n%s\n' 'Skill39' 'Skill39' | smbpasswd -a -s jamie"
+      cmd: "printf '%s\n%s\n' 'Skill39@Lyon' 'Skill39@Lyon' | smbpasswd -a -s jamie"
   - name: Enable Samba user
     ansible.builtin.shell:
       cmd: "smbpasswd -e jamie"

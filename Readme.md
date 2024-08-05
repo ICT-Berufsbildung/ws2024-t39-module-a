@@ -5,8 +5,17 @@ This repository contains all the necessary artifacts to build the module A Linux
 ### Prequisites
 * Packer
 * ESXi server
-
+  * Datastore containing all debian 12.5 BDs
+  * Access to the internet (necessary to build the python venv for grading)
+    * 3 virtual networks (Internal, Internet + DMZ).
+      Due to a limitation of the packer vsphere provider, it is necessary to provide network connectivity, DHCP + access to the host you're running packer on from all networks.
 ### Build
+
+This repository contains two packer files:
+  * `vms.pkr.hcl` builds the "empty" competitor vms, used in the competition.
+    * `solution.pkr.hcl` builds the vms containing the "master" solution, used to build and debug the grading scripts.
+    NOTE: We rely on as many functional tests as possible. There are multiple ways to configure specific services!
+
 
 ## Grading
 The grading script is using nornir to schedule tasks. A custom output plugin has been developed to customize the output, which prints a score report.
@@ -95,7 +104,7 @@ Use `-v` to show the command, which will be executed and its output. Use this fl
   $./grading -t A01_02 -v
   => [A01_02] OU Employees exists:                                         0.25
 Executed command on int-srv01 =>
-$ ldapsearch -H ldap://localhost -b dc=int,dc=worldskills,dc=org -x "(&(objectclass=organizationalunit)(ou=Employees))" -D cn=admin,dc=int,dc=worldskills,dc=org -w Skill39
+$ ldapsearch -H ldap://localhost -b dc=int,dc=worldskills,dc=org -x "(&(objectclass=organizationalunit)(ou=Employees))" -D cn=admin,dc=int,dc=worldskills,dc=org -w Skill39@Lyon
 > # extended LDIF
 #
 # LDAPv3
