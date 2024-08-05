@@ -59,7 +59,7 @@ build {
     inline = ["hostnamectl set-hostname ha-prx01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -97,7 +97,7 @@ build {
     inline = ["hostnamectl set-hostname ha-prx02"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -134,7 +134,7 @@ build {
     inline = ["hostnamectl set-hostname web01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -175,7 +175,7 @@ build {
     inline = ["hostnamectl set-hostname web02"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -221,7 +221,7 @@ build {
     inline = ["hostnamectl set-hostname mail"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -259,7 +259,7 @@ build {
     inline = ["hostnamectl set-hostname int-srv01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -296,7 +296,7 @@ build {
     inline = ["hostnamectl set-hostname jamie-ws01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -341,7 +341,7 @@ build {
     inline = ["hostnamectl set-hostname fw01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
