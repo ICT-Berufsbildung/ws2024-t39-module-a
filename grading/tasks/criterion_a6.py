@@ -20,7 +20,7 @@ def task_A06_01(task: Task) -> Result:
         if "Connected to 1.1.1.10" in cmd_result.result:
             score = 0.1
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     command = "curl -ksv --connect-timeout 2 https://1.1.1.10 2>&1"
     commands.append(command)
@@ -31,7 +31,7 @@ def task_A06_01(task: Task) -> Result:
         if "Connected to 1.1.1.10" in cmd_result.result:
             score += 0.1
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     if score > 0:
         msg = "Only tcp/80 or tcp/443 are reachable over WAN"     
@@ -62,7 +62,10 @@ def task_A06_02(task: Task) -> Result:
         if "dmz.worldskills.org" in cmd_result.result:
             msg = "udp/53 is reachable over WAN"
             score += 0.05
+    except Exception:
+        command_outputs.append(UNKNOWN_MSG)
 
+    try:
         cmd_result = run_command(task=task, command=second_command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org" in cmd_result.result:
@@ -73,7 +76,7 @@ def task_A06_02(task: Task) -> Result:
             )
             score += 0.05
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     return Result(
         host=task.host,

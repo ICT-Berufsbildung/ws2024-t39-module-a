@@ -24,6 +24,7 @@ from tasks import (
     criterion_a12,
     criterion_a13,
     criterion_a14,
+    criterion_a15
 )
 
 # Set working dir
@@ -103,6 +104,7 @@ host_ha_proxies = nr.filter(F(name__eq="ha-prx01") | F(name__eq="ha-prx02"))
 host_jamie = nr.filter(name="jamie-ws01")
 host_int_srv_vpn = nr.filter(F(name__eq="int-srv01") | F(name__eq="jamie-ws01"))
 host_web01 = nr.filter(name="web01")
+host_web02 = nr.filter(name="web02")
 
 tasks_to_run_int_srv = [
     criterion_a1.task_A01_01,
@@ -237,3 +239,6 @@ for task in tasks_to_run_ha_prx01:
 # Web server checks
 host_web01.run(task=criterion_a14.task_A14_01, on_failed=True)
 host_web01.run(task=criterion_a14.task_A14_02, on_failed=True)
+
+host_web02.run(task=criterion_a15.task_A15_01, on_failed=True)
+host_ha_prx01.run(task=criterion_a15.task_A15_02, on_failed=True)

@@ -118,7 +118,7 @@ def check_ldap_login(task: Task, username: str):
         if len(re_cn) > 0:
             cn = re_cn[0]
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     if cn:
         # Try to login

@@ -106,7 +106,10 @@ def task_A04_04(task: Task) -> Result:
         ):
             msg = "int-srv01 is secondary for dmz.worldskills.org."
             score += 0.05
+    except Exception:
+        command_outputs.append(UNKNOWN_MSG)
 
+    try:
         cmd_result = run_command(task=task, command=dig_command)
         command_outputs.append(cmd_result.result)
         if "dmz.worldskills.org." in cmd_result.result:
@@ -114,7 +117,7 @@ def task_A04_04(task: Task) -> Result:
         else:
             msg += " Cannot resolve dmz.worldskills.org on int-srv01"
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     return Result(
         host=task.host,
@@ -147,7 +150,7 @@ def task_A04_05(task: Task) -> Result:
             score += 0.05
 
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     try:
         cmd_result = run_command(task=task, command=dig_command)
@@ -157,7 +160,7 @@ def task_A04_05(task: Task) -> Result:
         else:
             msg += " Cannot resolve 20.1.10.in-addr.arpa on int-srv01;"
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     # IPv6 reverse zone check
     try:
@@ -170,7 +173,7 @@ def task_A04_05(task: Task) -> Result:
             msg = " is secondary for the IPv6 reverse zone"
             score += 0.05
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     try:
         cmd_result = run_command(task=task, command=v6_dig_command)
@@ -180,7 +183,7 @@ def task_A04_05(task: Task) -> Result:
         else:
             msg += "; cannot resolve IPv6 reverse in DMZ on int-srv01"
     except Exception:
-        pass
+        command_outputs.append(UNKNOWN_MSG)
 
     return Result(
         host=task.host,

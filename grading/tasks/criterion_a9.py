@@ -94,6 +94,7 @@ def task_A09_03(task: Task) -> Result:
     commands = [command]
     command_outputs = []
     msg = "User jamie cannot send to mail echo service"
+    cmd_result = None
 
     try:
         cmd_result = run_command(task=task, command=command)
