@@ -1,7 +1,7 @@
 from nornir.core.task import Task, Result
 from tasks.common.command_controller import run_command
 
-from tasks.common.helper import process_result_exit_code
+from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 
 
 def task_A03_01(task: Task) -> Result:
@@ -31,6 +31,7 @@ def task_A03_02(task: Task) -> Result:
     command = 'smbclient //localhost/public -I 127.0.0.1 -U "%" -c ls 2>&1 || true'
     score = 0
     msg = "Cannot access public share."
+    cmd_result = None
     try:
         # Read
         cmd_result = run_command(task=task, command=command)
@@ -48,7 +49,7 @@ def task_A03_02(task: Task) -> Result:
         host=task.host,
         result=msg,
         command_run=command,
-        command_output=cmd_result.result,
+        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
         score=score,
         max_score=0.25,
     )
@@ -56,6 +57,7 @@ def task_A03_02(task: Task) -> Result:
 
 def task_A03_03(task: Task) -> Result:
     """Write on public share with user"""
+    cmd_result = None
     score = 0
     msg = "Cannot access public share with user."
     write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/public -I 127.0.0.1 -U "jamie%Skill39@Lyon" -c "put /tmp/lorem.txt lorem.txt"'
@@ -75,7 +77,7 @@ def task_A03_03(task: Task) -> Result:
         host=task.host,
         result=msg,
         command_run=write_command,
-        command_output=cmd_result.result,
+        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
         score=score,
         max_score=0.25,
     )
@@ -84,6 +86,7 @@ def task_A03_03(task: Task) -> Result:
 def task_A03_04(task: Task) -> Result:
     """Write on public share without user"""
     score = 0
+    cmd_result = None
     msg = "Cannot access public share."
     write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/public -I 127.0.0.1 -U "%" -c "put /tmp/lorem.txt lorem.txt" 2>&1 || true'
     try:
@@ -99,7 +102,7 @@ def task_A03_04(task: Task) -> Result:
         host=task.host,
         result=msg,
         command_run=write_command,
-        command_output=cmd_result.result,
+        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
         score=score,
         max_score=0.25,
     )
@@ -112,6 +115,7 @@ def task_A03_05(task: Task) -> Result:
     write_command = (
         'smbclient //localhost/internal -I 127.0.0.1 -U "%" -c "ls" 2>&1 || true'
     )
+    cmd_result = None
     try:
         cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
@@ -125,7 +129,7 @@ def task_A03_05(task: Task) -> Result:
         host=task.host,
         result=msg,
         command_run=write_command,
-        command_output=cmd_result.result,
+        command_output=cmd_result.result if cmd_result else None,
         score=score,
         max_score=0.25,
     )
@@ -136,6 +140,7 @@ def task_A03_06(task: Task) -> Result:
     score = 0
     msg = "Cannot write on internal share with user"
     write_command = 'echo "Lorem Ipsum" > /tmp/lorem.txt; smbclient //localhost/internal -I 127.0.0.1 -U "jamie%Skill39@Lyon" -c "put /tmp/lorem.txt lorem.txt" || true'
+    cmd_result = None
     try:
         cmd_result = run_command(task=task, command=write_command)
         # Check if there is not login failure
@@ -152,7 +157,7 @@ def task_A03_06(task: Task) -> Result:
         host=task.host,
         result=msg,
         command_run=write_command,
-        command_output=cmd_result.result,
+        command_output=cmd_result.result if cmd_result else None,
         score=score,
         max_score=0.25,
     )

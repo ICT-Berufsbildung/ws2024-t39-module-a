@@ -27,7 +27,7 @@ def task_A10_01(task: Task) -> Result:
         max_score=0.2,
     )
 
-def task_A10_03(task: Task) -> Result:
+def task_A10_02(task: Task) -> Result:
     """Check backup script"""
     command = "rm -rf /opt/backup/* ; bash /opt/backup.sh"
     score = 0

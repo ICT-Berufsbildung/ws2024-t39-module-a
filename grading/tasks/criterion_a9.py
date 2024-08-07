@@ -5,39 +5,6 @@ from tasks.common.helper import UNKNOWN_MSG, process_result_exit_code
 
 
 def task_A09_01(task: Task) -> Result:
-    """Check if mail server is listening on port 143"""
-    command = "ss -tulpen | grep 143"
-    score = 0
-    cmd_result = None
-    msg = "No mail server listening on port 143"
-    v4_enabled = False
-    try:
-        cmd_result = run_command(task=task, command=command)
-        if "0.0.0.0:143" in cmd_result.result:
-            msg = "Mail server is reachable over IPv4 on tcp/143"
-            score += 0.05
-            v4_enabled = True
-        if "[::]:143" in cmd_result.result:
-            msg = (
-                "Mail server is reachable over IPv4 & IPv6 on tcp/143"
-                if v4_enabled
-                else "Mail server is reachable over IPv6 only on tcp/143"
-            )
-            score += 0.05
-    except Exception:
-        pass
-
-    return Result(
-        host=task.host,
-        result=msg,
-        command_run=command,
-        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
-        score=score,
-        max_score=0.1,
-    )
-
-
-def task_A09_02(task: Task) -> Result:
     """Check STARTTLS on port 143"""
     command = """timeout 2 bash -c 'echo "Q" | openssl s_client -connect 10.1.20.10:143 -verify_return_error -starttls imap' 2>&1"""
     score = 0
@@ -60,11 +27,11 @@ def task_A09_02(task: Task) -> Result:
         command_run=command,
         command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
         score=score,
-        max_score=0.2,
+        max_score=0.5,
     )
 
 
-def task_A09_03(task: Task) -> Result:
+def task_A09_02(task: Task) -> Result:
     """Send mail as jamie"""
     verify_command = "cat /etc/passwd | grep jamie"
     score = 0
@@ -120,7 +87,7 @@ def task_A09_03(task: Task) -> Result:
     )
 
 
-def task_A09_04(task: Task) -> Result:
+def task_A09_03(task: Task) -> Result:
     """test echo service"""
     score = 0
     command = "printf 'Subject: WSC2024_ECHO_FLAG\nFrom: jamie.oliver@dmz.worldskills.org\nTo: echo@dmz.worldskills.org\n\nWSC2024_ECHO_FLAG' | curl -s -k --ssl-reqd  --url smtps://localhost --user jamie:Skill39@Lyon --mail-from 'jamie.oliver@dmz.worldskills.org(Jamie Oliver)' --mail-rcpt echo@dmz.worldskills.org --upload-file -"
@@ -160,5 +127,5 @@ def task_A09_04(task: Task) -> Result:
         command_run=commands,
         command_output=command_outputs,
         score=score,
-        max_score=0.85,
+        max_score=1.5,
     )

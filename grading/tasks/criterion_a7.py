@@ -90,30 +90,6 @@ def task_A07_03(task: Task) -> Result:
 
 
 def task_A07_04(task: Task) -> Result:
-    """Check if wireguard is configured as systemd service"""
-    command = "systemctl is-active wg-quick@wg0.service"
-    score = 0
-    cmd_result = None
-    msg = "systemd service for wireguard not available nor active"
-    try:
-        cmd_result = run_command(task=task, command=command)
-        if "active" in cmd_result.result:
-            msg = "systemd service for wireguard is active"
-            score = 0.1
-    except Exception:
-        pass
-
-    return Result(
-        host=task.host,
-        result=msg,
-        command_run=command,
-        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
-        score=score,
-        max_score=0.1,
-    )
-
-
-def task_A07_05(task: Task) -> Result:
     """End-to-End test"""
     command = "dig +time=2 +tries=1 +short @10.1.10.10 int.worldskills.org SOA"
     score = 0
