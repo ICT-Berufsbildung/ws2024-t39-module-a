@@ -14,10 +14,10 @@ def task_A09_01(task: Task) -> Result:
         cmd_result = run_command(task=task, command=command)
         if "Verification: OK" in cmd_result.result:
             msg = "Certificate is valid."
-            score += 0.1
+            score += 0.25
         if "CN = ClearSky Root CA" in cmd_result.result:
             msg += " Signed by ClearSky Root CA"
-            score += 0.1
+            score += 0.25
     except Exception:
         pass
 
@@ -67,7 +67,7 @@ def task_A09_02(task: Task) -> Result:
 
     # Search for Subject WSC2024_FLAG on IMAP server
     cmd_result = None
-    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@Lyon@localhost/INBOX?SUBJECT%20WSC2024_FLAG 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@Lyon@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
+    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k --user jamie:Skill39@Lyon imaps://localhost/INBOX?SUBJECT%20WSC2024_FLAG 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k --user jamie:Skill39@Lyon "imaps://localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
     commands.append(command)
     try:
         cmd_result = run_command(task=task, command=command)
@@ -105,7 +105,7 @@ def task_A09_03(task: Task) -> Result:
 
     # Search for Subject WSC2024_ECHO_FLAG on IMAP server
     cmd_result = None
-    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k imaps://jamie:Skill39@Lyon@localhost/INBOX?FROM%20echo@dmz.worldskills.org 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k "imaps://jamie:Skill39@Lyon@localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
+    command = r"""IFS=" " read -r -a mail_ids <<< "$(curl -s -k --user jamie:Skill39@Lyon imaps://localhost/INBOX?FROM%20echo@dmz.worldskills.org 2>&1 | grep -oP '(?<=SEARCH)[ 0-9]+')" && curl -s -k --user jamie:Skill39@Lyon "imaps://localhost/INBOX;MAILINDEX=${mail_ids[-1]}" 2>&1"""
     commands.append(command)
     try:
         cmd_result = run_command(task=task, command=command)
@@ -117,7 +117,7 @@ def task_A09_03(task: Task) -> Result:
             and "from: echo@dmz.worldskills.org"
             and "report-type=delivery-status"
         ):
-            score = 0.85
+            score = 1.5
             msg = "Echo mail has been received"
     except Exception:
         command_outputs.append(cmd_result.result if cmd_result else UNKNOWN_MSG)
