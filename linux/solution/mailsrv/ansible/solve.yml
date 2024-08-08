@@ -14,7 +14,6 @@
           - dovecot-ldap
           - dovecot-sieve
           - dovecot-imapd
-          - cryptsetup
         state: present
 
     - name: Copy postfix config
