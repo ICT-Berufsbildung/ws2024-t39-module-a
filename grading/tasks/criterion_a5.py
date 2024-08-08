@@ -17,7 +17,7 @@ def task_A05_01(task: Task) -> Result:
             score += 0.1
         
         if "net.ipv6.conf.all.forwarding = 1" in cmd_result.result:
-            msg += "; IPv6 forwarding is enabled."
+            msg += "; IPv6 forwarding is enabled"
             score += 0.1
     except Exception:
         pass

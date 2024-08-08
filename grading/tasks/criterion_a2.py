@@ -7,7 +7,7 @@ from tasks.common.helper import UNKNOWN_MSG
 def task_A02_01(task: Task) -> Result:
     """Root CA check"""
     command = (
-        "openssl x509 -in /opt/grading/ca/ca.pem -noout -subject -ext basicConstraints,keyUsage"
+        "openssl x509 -in /opt/grading/ca/ca.pem -noout -subject -ext basicConstraints,keyUsage || exit 0"
     )
     score = 0
     cmd_result = None
@@ -51,7 +51,7 @@ def task_A02_02(task: Task) -> Result:
         command_outputs.append(UNKNOWN_MSG)
 
     verify_command = (
-        "openssl verify -CAfile /opt/grading/ca/ca.pem /opt/grading/ca/services.pem"
+        "openssl verify -CAfile /opt/grading/ca/ca.pem /opt/grading/ca/services.pem || exit 0"
     )
     try:
         verify_cmd_result = run_command(task=task, command=verify_command)
@@ -74,7 +74,7 @@ def task_A02_02(task: Task) -> Result:
 
 def task_A02_03(task: Task) -> Result:
     """webserver cert check"""
-    command = "openssl x509 -in /opt/grading/ca/web.pem -noout -subject"
+    command = "openssl x509 -in /opt/grading/ca/web.pem -noout -subject || exit 0"
     score = 0
     msg = "webserver cert DOES NOT exist"
     command_outputs = []
@@ -87,7 +87,7 @@ def task_A02_03(task: Task) -> Result:
     except Exception:
         command_outputs.append(UNKNOWN_MSG)
 
-    verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/services.pem /opt/grading/ca/ca.pem) /opt/grading/ca/web.pem"
+    verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/services.pem /opt/grading/ca/ca.pem) /opt/grading/ca/web.pem || exit 0"
     try:
         verify_cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(verify_cmd_result.result)
@@ -109,7 +109,7 @@ def task_A02_03(task: Task) -> Result:
 
 def task_A02_04(task: Task) -> Result:
     """mailserver cert check"""
-    command = "openssl x509 -in /opt/grading/ca/mail.pem -noout -subject"
+    command = "openssl x509 -in /opt/grading/ca/mail.pem -noout -subject || exit 0"
     score = 0
     msg = "mailserver cert DOES NOT exist"
     command_outputs = []
@@ -122,7 +122,7 @@ def task_A02_04(task: Task) -> Result:
     except Exception:
         command_outputs.append(UNKNOWN_MSG)
 
-    verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/services.pem /opt/grading/ca/ca.pem) /opt/grading/ca/mail.pem"
+    verify_command = "openssl verify -CAfile <(cat /opt/grading/ca/services.pem /opt/grading/ca/ca.pem) /opt/grading/ca/mail.pem || exit 0"
     try:
         verify_cmd_result = run_command(task=task, command=verify_command)
         command_outputs.append(verify_cmd_result.result)
