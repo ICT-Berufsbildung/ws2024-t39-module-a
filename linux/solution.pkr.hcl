@@ -8,8 +8,6 @@ packer {
 }
 
 source "vsphere-iso" "base" {
-  CPUs         = 2
-  RAM          = 1024
   boot_command = [
     "<esc><wait>",
     #"auto url=http://10.20.11.20:{{ .HTTPPort }}/preseed.cfg interface=ens192<wait>", "<enter><wait>"
@@ -50,6 +48,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "ha-prx01-SOLVED"
+    CPUs         = 4
+    RAM          = 8192
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -88,6 +88,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "ha-prx02-SOLVED"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -125,6 +127,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "web01-SOLVED"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -166,6 +170,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "web02-SOLVED"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -208,6 +214,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "mail-SOLVED"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -250,6 +258,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "int-srv01-SOLVED"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "Internal"
@@ -287,6 +297,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "jamie-ws01-SOLVED"
+    CPUs         = 4
+    RAM          = 8192
     network_adapters {
       network_card = "vmxnet3"
       network = "Internal"
@@ -324,6 +336,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "fw01-SOLVED"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters{
       network_card = "vmxnet3"
       network = "Internet"
