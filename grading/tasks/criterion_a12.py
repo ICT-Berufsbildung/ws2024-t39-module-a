@@ -1,7 +1,7 @@
 from nornir.core.task import Task, Result
 from tasks.common.command_controller import run_command
 
-from tasks.common.helper import UNKNOWN_MSG
+from tasks.common.helper import UNKNOWN_MSG, task_get_ca_cert
 
 
 def task_A12_01(task: Task) -> Result:
@@ -145,40 +145,35 @@ def task_A12_05(task: Task) -> Result:
 
 
 def task_A12_06a(task: Task) -> Result:
-    """Pretask to get certificate fingerprint"""
-    command = "openssl x509 -fingerprint -in /opt/grading/ca/web.pem -noout"
-    cmd_result = None
-    fingerprint = ""
-    try:
-        cmd_result = run_command(task=task, command=command)
-        fingerprint = cmd_result.result.replace("SHA1 Fingerprint=", "")
-    except Exception:
-        # Exit code 1
-        pass
-    return Result(
-        host=task.host,
-        result=fingerprint,
-        command=f"root@{task.host} $ {command}",
-        command_output=cmd_result.result if cmd_result else UNKNOWN_MSG,
-    )
+    """Pretask to get ca certificate"""
+    return task_get_ca_cert(task)
 
 
 def task_A12_06(
     task: Task,
-    certificate_fingerprint: str,
+    ca_cert: str,
     check_command: str,
     check_command_output: str,
 ) -> Result:
     """Check HTTPS certificate"""
-    command = "timeout 2 openssl s_client -connect www.dmz.worldskills.org:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -noout -in /dev/stdin"
+    command = """timeout 2 bash -c 'echo "Q" | openssl s_client -connect www.dmz.worldskills.org:443 -CAfile /tmp/ca.pem || echo "Q" | openssl s_client -connect www.dmz.worldskills.org:443' 2>&1 || exit 0"""
     score = 0
     cmd_result = None
     msg = "TLS certificate is not signed by CA"
+
+    try:
+        run_command(task=task, command=f'echo "{ca_cert}" > /tmp/ca.pem')
+    except Exception:
+        pass
+
     try:
         cmd_result = run_command(task=task, command=command)
-        if certificate_fingerprint in cmd_result.result:
-            msg = "TLS certificate is signed by CA"
-            score = 0.4
+        if "Verification: OK" in cmd_result.result:
+            msg = "Certificate is valid."
+            score += 0.2
+        if "clearsky root ca" in cmd_result.result.lower():
+            msg += " Signed by ClearSky Root CA"
+            score += 0.2
     except Exception:
         # Exit code 1
         score += 0
