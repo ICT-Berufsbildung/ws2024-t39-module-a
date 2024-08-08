@@ -45,7 +45,7 @@
       copy:
         src: "id_ed25519"
         dest: "/root/.ssh/"
-        mode: 600
+        mode: 0600
         owner: root
         group: root
     - name: Copy public ssh key to .ssh of root
