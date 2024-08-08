@@ -38,7 +38,6 @@
 
     - name: Install vscode extensions
       ansible.builtin.shell: |
-        code --install-extension ms-vscode-remote.remote-ssh
         code --install-extension redhat.ansible
         code --install-extension ms-python.python
         code --install-extension wholroyd.jinja
