@@ -1,0 +1,59 @@
+---
+- hosts: all
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Install packages
+      ansible.builtin.package:
+        name:
+          - gnome
+          - firefox-esr
+          - zeal
+          - sudo
+        state: present
+
+    - name: remove gnome initial setup
+      ansible.builtin.package:
+        name: gnome-initial-setup
+        state: absent
+
+    - name: Create user
+      user:
+        name: "user"
+        password: "{{ 'Skill39@Lyon' | password_hash('sha512') }}"
+        shell: /bin/bash
+      become: true
+
+    - name: Add user to sudoers
+      user:
+        name: "user"
+        groups: sudo
+        append: yes
+      become: true
+
+    - name: Install vscode
+      ansible.builtin.apt:
+        deb: https://vscode.download.prss.microsoft.com/dbazure/download/stable/b1c0a14de1414fcdaa400695b4db1c0799bc3124/code_1.92.0-1722473020_amd64.deb
+
+    - name: Install vscode extensions
+      ansible.builtin.shell: |
+        code --install-extension ms-vscode-remote.remote-ssh
+        code --install-extension redhat.ansible
+        code --install-extension ms-python.python
+        code --install-extension wholroyd.jinja
+      become: yes
+      become_user: user
+
+    - name: Make sure Zeal directory exists
+      ansible.builtin.file:
+        dest: "/home/user/.local/share/Zeal/Zeal"
+        state: directory
+
+    - name: Extract docsets
+      ansible.builtin.unarchive:
+        src: "/tmp/docsets.zip"
+        dest: "/home/user/.local/share/Zeal/Zeal/"
+        remote_src: yes
+        owner: user
+        group: user
