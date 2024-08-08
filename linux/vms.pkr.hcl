@@ -9,8 +9,7 @@ packer {
 
 source "vsphere-iso" "base" {
 
-  CPUs         = 2
-  RAM          = 1024
+
   boot_command = [
     "<esc><wait>",
     "auto url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg interface=ens192<wait>", "<enter><wait>"
@@ -39,10 +38,10 @@ source "vsphere-iso" "base" {
   http_port_min  = 5100
   http_port_max  = 5150
   tools_sync_time = true
-#  export {
-#    force = true
-#    output_directory = "./output-artifacts"
-#  }
+  #  export {
+  #    force = true
+  #    output_directory = "./output-artifacts"
+  #  }
 }
 # ha-prx01
 build {
@@ -50,6 +49,9 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "ha-prx01"
+    video_ram = 256000
+    CPUs    = 4
+    RAM     = 8192
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -58,12 +60,26 @@ build {
   provisioner "shell" {
     inline = ["hostnamectl set-hostname ha-prx01"]
   }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/ha-prx01/g' /etc/hosts"]
+  }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
     inline = ["ansible-playbook /tmp/artifacts/setup_grading.yml -i 'localhost,'"]
+  }
+  provisioner "file" {
+    source = "http/ha-prx/setup.yml"
+    destination = "/tmp/setup.yml"
+  }
+  provisioner "file" {
+    source = "http/ha-prx/docsets.zip"
+    destination = "/tmp/docsets.zip"
+  }
+  provisioner "shell" {
+    inline = ["ansible-playbook /tmp/setup.yml -i 'localhost,'"]
   }
   provisioner "file" {
     source = "http/ha-prx/interfaces01"
@@ -81,6 +97,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "ha-prx02"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -90,7 +108,7 @@ build {
     inline = ["hostnamectl set-hostname ha-prx02"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -111,6 +129,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "web01"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -120,7 +140,7 @@ build {
     inline = ["hostnamectl set-hostname web01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -145,6 +165,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "web02"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -154,7 +176,7 @@ build {
     inline = ["hostnamectl set-hostname web02"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -179,6 +201,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "mail"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "DMZ"
@@ -192,7 +216,7 @@ build {
     inline = ["hostnamectl set-hostname mail"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -213,6 +237,8 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "int-srv01"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters {
       network_card = "vmxnet3"
       network = "Internal"
@@ -222,7 +248,7 @@ build {
     inline = ["hostnamectl set-hostname int-srv01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -243,6 +269,9 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "jamie-ws01"
+    video_ram = 256000
+    CPUs         = 4
+    RAM          = 8192
     network_adapters {
       network_card = "vmxnet3"
       network = "Internal"
@@ -252,7 +281,7 @@ build {
     inline = ["hostnamectl set-hostname jamie-ws01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
@@ -273,11 +302,13 @@ build {
   sources = ["source.vsphere-iso.base"]
   source "source.vsphere-iso.base" {
     vm_name = "fw01"
+    CPUs         = 2
+    RAM          = 2048
     network_adapters{
       network_card = "vmxnet3"
       network = "Internet"
     }
-     network_adapters{
+    network_adapters{
       network_card = "vmxnet3"
       network = "Internal"
     }
@@ -290,7 +321,7 @@ build {
     inline = ["hostnamectl set-hostname fw01"]
   }
   provisioner "file" {
-    source = "grading/artifacts"
+    source = "../grading/artifacts"
     destination = "/tmp"
   }
   provisioner "shell" {
