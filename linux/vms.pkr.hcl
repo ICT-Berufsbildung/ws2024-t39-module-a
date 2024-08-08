@@ -107,6 +107,9 @@ build {
   provisioner "shell" {
     inline = ["hostnamectl set-hostname ha-prx02"]
   }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/ha-prx02/g' /etc/hosts"]
+  }
   provisioner "file" {
     source = "../grading/artifacts"
     destination = "/tmp"
@@ -135,6 +138,9 @@ build {
       network_card = "vmxnet3"
       network = "DMZ"
     }
+  }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/web01/g' /etc/hosts"]
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname web01"]
@@ -175,6 +181,9 @@ build {
   provisioner "shell" {
     inline = ["hostnamectl set-hostname web02"]
   }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/web02/g' /etc/hosts"]
+  }
   provisioner "file" {
     source = "../grading/artifacts"
     destination = "/tmp"
@@ -213,6 +222,9 @@ build {
     }
   }
   provisioner "shell" {
+    inline = ["sed -i 's/debian/mail/g' /etc/hosts"]
+  }
+  provisioner "shell" {
     inline = ["hostnamectl set-hostname mail"]
   }
   provisioner "file" {
@@ -247,6 +259,9 @@ build {
   provisioner "shell" {
     inline = ["hostnamectl set-hostname int-srv01"]
   }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/int-srv01/g' /etc/hosts"]
+  }
   provisioner "file" {
     source = "../grading/artifacts"
     destination = "/tmp"
@@ -279,6 +294,9 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname jamie-ws01"]
+  }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/jamie-ws01/g' /etc/hosts"]
   }
   provisioner "file" {
     source = "../grading/artifacts"
@@ -319,6 +337,9 @@ build {
   }
   provisioner "shell" {
     inline = ["hostnamectl set-hostname fw01"]
+  }
+  provisioner "shell" {
+    inline = ["sed -i 's/debian/fw01/g' /etc/hosts"]
   }
   provisioner "file" {
     source = "../grading/artifacts"
